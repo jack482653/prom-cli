@@ -1,0 +1,187 @@
+import axios, { AxiosError, AxiosInstance } from "axios";
+
+import type {
+  ActiveTarget,
+  BuildInfo,
+  Config,
+  PrometheusResponse,
+  QueryResult,
+  ServerStatus,
+  Target,
+  TargetsData,
+} from "../types/index.js";
+
+/**
+ * Error messages for consistent user feedback
+ */
+export const ErrorMessages = {
+  NO_CONFIG: `Error: No server configured.
+Run 'prom config <url>' to configure your Prometheus server.`,
+
+  INVALID_URL: `Error: Invalid URL format.
+URL must start with http:// or https://
+Example: prom config http://localhost:9090`,
+
+  connectionFailed: (url: string, reason: string) => `Error: Could not connect to Prometheus server.
+URL: ${url}
+Reason: ${reason}
+
+Troubleshooting:
+  - Check if Prometheus is running
+  - Verify the URL is correct
+  - Check network connectivity`,
+
+  AUTH_FAILED: `Error: Authentication failed (401 Unauthorized).
+Hint: Check your username/password or token.
+Run 'prom config --show' to view current settings.`,
+
+  invalidPromQL: (message: string) =>
+    `Error: Invalid PromQL expression.
+Server response: ${message}`,
+};
+
+/**
+ * Create axios instance with config
+ */
+export function createClient(config: Config): AxiosInstance {
+  const client = axios.create({
+    baseURL: config.serverUrl,
+    timeout: config.timeout ?? 30000,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+
+  // Add auth headers
+  if (config.auth) {
+    if (config.auth.type === "basic" && config.auth.username) {
+      const credentials = Buffer.from(`${config.auth.username}:${config.auth.password}`).toString(
+        "base64",
+      );
+      client.defaults.headers.common["Authorization"] = `Basic ${credentials}`;
+    } else if (config.auth.type === "bearer" && config.auth.token) {
+      client.defaults.headers.common["Authorization"] = `Bearer ${config.auth.token}`;
+    }
+  }
+
+  return client;
+}
+
+/**
+ * Handle axios errors with user-friendly messages
+ */
+export function handleError(error: unknown, serverUrl: string): never {
+  if (error instanceof AxiosError) {
+    if (error.response?.status === 401) {
+      console.error(ErrorMessages.AUTH_FAILED);
+      process.exit(2);
+    }
+
+    if (error.code === "ECONNREFUSED" || error.code === "ENOTFOUND") {
+      console.error(ErrorMessages.connectionFailed(serverUrl, error.code || "Unknown"));
+      process.exit(2);
+    }
+
+    if (error.response?.data?.error) {
+      console.error(ErrorMessages.invalidPromQL(error.response.data.error));
+      process.exit(1);
+    }
+
+    console.error(ErrorMessages.connectionFailed(serverUrl, error.message || "Unknown"));
+    process.exit(2);
+  }
+
+  throw error;
+}
+
+/**
+ * Fetch scrape targets from Prometheus
+ */
+export async function getTargets(client: AxiosInstance): Promise<Target[]> {
+  const response = await client.get<PrometheusResponse<TargetsData>>("/api/v1/targets");
+
+  if (response.data.status !== "success" || !response.data.data) {
+    return [];
+  }
+
+  return response.data.data.activeTargets.map(
+    (target: ActiveTarget): Target => ({
+      job: target.labels.job || "",
+      instance: target.labels.instance || "",
+      health: target.health,
+      lastScrape: new Date(target.lastScrape),
+      lastScrapeDuration: target.lastScrapeDuration,
+      labels: target.labels,
+    }),
+  );
+}
+
+/**
+ * Execute instant PromQL query
+ */
+export async function query(
+  client: AxiosInstance,
+  expr: string,
+  time?: string,
+): Promise<QueryResult> {
+  const params = new URLSearchParams();
+  params.append("query", expr);
+  if (time) {
+    params.append("time", time);
+  }
+
+  const response = await client.post<PrometheusResponse<QueryResult>>("/api/v1/query", params);
+
+  if (response.data.status !== "success" || !response.data.data) {
+    throw new Error(response.data.error || "Query failed");
+  }
+
+  return response.data.data;
+}
+
+/**
+ * Get server health, readiness, and build info
+ */
+export async function getStatus(client: AxiosInstance): Promise<ServerStatus> {
+  const [healthRes, readyRes, buildRes] = await Promise.allSettled([
+    client.get("/-/healthy"),
+    client.get("/-/ready"),
+    client.get<PrometheusResponse<BuildInfo>>("/api/v1/status/buildinfo"),
+  ]);
+
+  const healthy = healthRes.status === "fulfilled" && healthRes.value.status === 200;
+  const ready = readyRes.status === "fulfilled" && readyRes.value.status === 200;
+
+  let buildInfo: BuildInfo | undefined;
+  if (buildRes.status === "fulfilled" && buildRes.value.data.status === "success") {
+    buildInfo = buildRes.value.data.data;
+  }
+
+  return { healthy, ready, buildInfo };
+}
+
+/**
+ * Format relative time (e.g., "2s ago", "5m ago")
+ */
+export function formatRelativeTime(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+
+  if (diffSec < 60) {
+    return `${diffSec}s ago`;
+  }
+
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) {
+    return `${diffMin}m ago`;
+  }
+
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) {
+    return `${diffHour}h ago`;
+  }
+
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay}d ago`;
+}

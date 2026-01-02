@@ -8,6 +8,7 @@
     "prom": "dist/index.js"
   },
   "scripts": {
+    "prepare": "tsc",
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",

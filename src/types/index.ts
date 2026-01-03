@@ -102,3 +102,41 @@ export interface ActiveTarget {
   scrapeInterval: string;
   scrapeTimeout: string;
 }
+
+/**
+ * Parameters for range query API call
+ * Source: /api/v1/query_range endpoint
+ */
+export interface QueryRangeParams {
+  query: string; // PromQL expression
+  start: number; // Start timestamp (Unix epoch seconds)
+  end: number; // End timestamp (Unix epoch seconds)
+  step: number; // Resolution step in seconds
+}
+
+/**
+ * Result from range query (always matrix type)
+ * Source: /api/v1/query_range endpoint
+ */
+export interface QueryRangeResult {
+  resultType: "matrix";
+  result: MatrixResult[];
+}
+
+/**
+ * CLI options for query-range command
+ */
+export interface QueryRangeOptions {
+  start: string; // Required: start time expression
+  end: string; // Required: end time expression
+  step?: number; // Optional: step in seconds
+  json?: boolean; // Optional: JSON output flag
+}
+
+/**
+ * Result of parsing a time expression
+ */
+export interface TimeParseResult {
+  timestamp: number; // Unix epoch seconds
+  isRelative: boolean; // Whether the input was a relative expression
+}

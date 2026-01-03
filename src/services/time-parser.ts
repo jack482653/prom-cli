@@ -87,6 +87,12 @@ function parseRelativeDuration(expression: string): TimeParseResult | null {
  * Returns null if not a valid RFC3339 format
  */
 function parseRFC3339(expression: string): TimeParseResult | null {
+  // Validate RFC3339 format strictly to avoid ambiguous date parsing
+  const rfc3339Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|([+-])\d{2}:\d{2})$/;
+  if (!rfc3339Regex.test(expression)) {
+    return null;
+  }
+
   const date = new Date(expression);
 
   if (isNaN(date.getTime())) {

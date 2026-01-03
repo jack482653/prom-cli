@@ -7,6 +7,9 @@ import { ErrorMessages, createClient, handleError, queryRange } from "../service
 import { calculateDefaultStep, parseTimeExpression } from "../services/time-parser.js";
 import type { MatrixResult, QueryRangeOptions } from "../types/index.js";
 
+/** Threshold for warning about large result sets */
+const LARGE_RESULT_SET_THRESHOLD = 1500;
+
 /**
  * Format labels for display
  */
@@ -127,7 +130,7 @@ Time range: ${options.start} to ${options.end}`);
 
         // Warn for large result sets
         const totalDataPoints = result.result.reduce((sum, r) => sum + r.values.length, 0);
-        if (totalDataPoints > 1500) {
+        if (totalDataPoints > LARGE_RESULT_SET_THRESHOLD) {
           console.warn(
             `Warning: Large result set (${totalDataPoints} data points). Consider using a larger step or shorter time range.`,
           );

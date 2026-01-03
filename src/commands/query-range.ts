@@ -45,12 +45,12 @@ function getValueRange(values: [number, string][]): { min: string; max: string }
  */
 export function createQueryRangeCommand(): Command {
   const cmd = new Command("query-range")
-    .description("Execute PromQL range query")
+    .description("Execute PromQL range query (table shows summary, use --json for all data points)")
     .argument("<expression>", "PromQL expression")
     .requiredOption("-s, --start <time>", "Start time (RFC3339 or relative: 1h, 30m, now)")
     .requiredOption("-e, --end <time>", "End time (RFC3339 or relative: 1h, 30m, now)")
     .option("-p, --step <seconds>", "Resolution step in seconds", parseInt)
-    .option("-j, --json", "Output as JSON")
+    .option("-j, --json", "Output as JSON (includes all timestamps and values)")
     .action(async (expression: string, options: QueryRangeOptions) => {
       const config = loadConfig();
 

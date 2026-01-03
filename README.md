@@ -6,6 +6,7 @@ A command-line tool for querying Prometheus from your terminal.
 
 - Configure Prometheus server connection with authentication support
 - Execute PromQL instant queries
+- Execute PromQL range queries with relative time support (1h, 30m, now)
 - List scrape targets and their health status
 - Check server health and version information
 - Table and JSON output formats
@@ -161,6 +162,60 @@ prom query "up" --time "2024-01-01T00:00:00Z"
 # Output as JSON
 prom query "up" --json
 ```
+
+### prom query-range
+
+Execute PromQL range query over a time period.
+
+```bash
+prom query-range <expression> --start <time> --end <time> [options]
+```
+
+**Options:**
+
+| Option                 | Description                                        |
+| ---------------------- | -------------------------------------------------- |
+| `-s, --start <time>`   | Start time (RFC3339 or relative: 1h, 30m, now)     |
+| `-e, --end <time>`     | End time (RFC3339 or relative: 1h, 30m, now)       |
+| `-p, --step <seconds>` | Resolution step in seconds (auto-calculated if omitted) |
+| `-j, --json`           | Output as JSON (includes all timestamps and values) |
+
+**Output Formats:**
+
+- **Table (default)**: Shows a summary per time series with metric name, labels, data point count, and min/max value range
+- **JSON (`--json`)**: Returns all timestamps and values for each time series
+
+**Examples:**
+
+```bash
+# Query last hour with relative time
+$ prom query-range "up" --start "1h" --end "now"
+METRIC  LABELS                                      POINTS  RANGE
+up      {instance="localhost:9090",job="prometheus"}  201     1 - 1
+up      {instance="localhost:9100",job="node"}        201     0 - 1
+
+Time range: 1h to now (step: 18s)
+Total: 2 series, 402 data points
+
+# Query with absolute timestamps
+prom query-range "up" --start "2024-01-01T00:00:00Z" --end "2024-01-01T01:00:00Z"
+
+# Query with custom step (60 seconds)
+prom query-range "rate(http_requests_total[5m])" --start "1h" --end "now" --step 60
+
+# Get full data with all timestamps (JSON output)
+prom query-range "up" --start "5m" --end "now" --json
+```
+
+**Relative Time Formats:**
+
+| Format | Meaning           |
+| ------ | ----------------- |
+| `now`  | Current time      |
+| `30s`  | 30 seconds ago    |
+| `5m`   | 5 minutes ago     |
+| `1h`   | 1 hour ago        |
+| `7d`   | 7 days ago        |
 
 ### prom status
 

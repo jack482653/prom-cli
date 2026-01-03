@@ -1,14 +1,14 @@
 <!--
 === Sync Impact Report ===
-Version change: 1.0.0 → 1.1.0 (Minor - expanded Testing Standards with TDD/BDD)
-Modified principles:
-  - II. Testing Standards → II. Testing Standards (TDD/BDD) [expanded]
-Added sections: None
+Version change: 1.1.0 → 1.2.0 (Minor - added Git Commit Standards)
+Modified principles: None
+Added sections:
+  - Git Commit Standards (under Development Workflow)
 Removed sections: None
 Templates requiring updates:
-  ✅ plan-template.md - Already compatible (Constitution Check section)
-  ✅ spec-template.md - Already uses Given/When/Then BDD format
-  ✅ tasks-template.md - Already includes "tests FIRST, ensure they FAIL"
+  ✅ plan-template.md - No changes needed
+  ✅ spec-template.md - No changes needed
+  ✅ tasks-template.md - Compatible (task-based commits align with task structure)
 Follow-up TODOs: None
 ========================
 -->
@@ -110,6 +110,43 @@ Code MUST solve current problems only, not hypothetical future ones.
 - PR descriptions MUST explain what and why, not just how
 - Tests MUST be written before implementation (TDD)
 
+### Git Commit Standards
+
+**Commit Frequency** - Every completed task (T001, T002, etc.) MUST have its own commit:
+
+- After completing each individual task
+- When transitioning between task categories (Infrastructure → API → CLI, etc.)
+- When abandoning a plan (commit with immediate reasoning)
+
+**Commit Message Format**:
+
+```
+<type>(<scope>): <message title>
+
+- Bullet points summarizing what was updated
+```
+
+**Allowed Types**:
+
+| Type     | Description                           |
+| -------- | ------------------------------------- |
+| feat     | New feature                           |
+| fix      | Bug fix                               |
+| chore    | Maintenance (e.g., tooling, deps)     |
+| docs     | Documentation changes                 |
+| refactor | Code restructure (no behavior change) |
+| test     | Adding or refactoring tests           |
+| style    | Code formatting (no logic change)     |
+| perf     | Performance improvements              |
+
+**Rules**:
+
+- Title MUST be lowercase, no period at the end
+- Title MUST be a clear summary, max 50 characters
+- Body (optional) SHOULD explain _why_, not just _what_
+- Bullet points MUST be concise and high-level
+- Vague titles like "update", "fix stuff" are NOT allowed
+
 ## Quality Gates
 
 Before merging, all PRs MUST pass:
@@ -129,4 +166,4 @@ This constitution defines non-negotiable standards for the prom-cli project.
 - Amendments require updating this document with rationale
 - When in doubt, choose the simpler solution
 
-**Version**: 1.1.0 | **Ratified**: 2024-12-31 | **Last Amended**: 2025-01-02
+**Version**: 1.2.0 | **Ratified**: 2024-12-31 | **Last Amended**: 2025-01-03

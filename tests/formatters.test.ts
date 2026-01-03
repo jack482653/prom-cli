@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { formatJson, formatJsonCompact } from "../src/formatters/json.js";
-import { formatQueryTable, formatTable, formatTargetsTable } from "../src/formatters/table.js";
+import {
+  formatMatrixTable,
+  formatQueryTable,
+  formatTable,
+  formatTargetsTable,
+} from "../src/formatters/table.js";
 
 describe("JSON Formatter", () => {
   describe("formatJson()", () => {
@@ -181,6 +186,80 @@ describe("Table Formatter", () => {
 
         const lines = result.split("\n");
         expect(lines.length).toBe(3); // Header + 2 rows
+      });
+    });
+  });
+
+  describe("formatMatrixTable()", () => {
+    describe("Given matrix results with single series", () => {
+      it("should format with correct columns: METRIC, LABELS, POINTS, RANGE", () => {
+        const result = formatMatrixTable([
+          {
+            metric: "up",
+            labels: '{instance="localhost:9090",job="prometheus"}',
+            points: 60,
+            min: "1",
+            max: "1",
+          },
+        ]);
+
+        expect(result).toContain("METRIC");
+        expect(result).toContain("LABELS");
+        expect(result).toContain("POINTS");
+        expect(result).toContain("RANGE");
+        expect(result).toContain("up");
+        expect(result).toContain("60");
+        expect(result).toContain("1 - 1");
+      });
+    });
+
+    describe("Given matrix results with multiple series", () => {
+      it("should display all series", () => {
+        const result = formatMatrixTable([
+          {
+            metric: "up",
+            labels: '{instance="localhost:9090"}',
+            points: 60,
+            min: "1",
+            max: "1",
+          },
+          {
+            metric: "up",
+            labels: '{instance="localhost:9100"}',
+            points: 60,
+            min: "0",
+            max: "1",
+          },
+        ]);
+
+        const lines = result.split("\n");
+        expect(lines.length).toBe(3); // Header + 2 rows
+        expect(result).toContain("localhost:9090");
+        expect(result).toContain("localhost:9100");
+      });
+    });
+
+    describe("Given empty matrix results", () => {
+      it("should return 'No data'", () => {
+        const result = formatMatrixTable([]);
+
+        expect(result).toBe("No data");
+      });
+    });
+
+    describe("Given varying value ranges", () => {
+      it("should display min - max range", () => {
+        const result = formatMatrixTable([
+          {
+            metric: "cpu_usage",
+            labels: '{host="server1"}',
+            points: 100,
+            min: "0.15",
+            max: "0.98",
+          },
+        ]);
+
+        expect(result).toContain("0.15 - 0.98");
       });
     });
   });

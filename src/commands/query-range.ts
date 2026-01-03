@@ -151,9 +151,8 @@ Time range: ${options.start} to ${options.end}`);
         console.log(formatMatrixTable(tableData));
 
         // Summary line
-        const totalPoints = result.result.reduce((sum, r) => sum + r.values.length, 0);
         console.log(
-          `\nTime range: ${options.start} to ${options.end} (step: ${step}s)\nTotal: ${result.result.length} series, ${totalPoints} data points`,
+          `\nTime range: ${options.start} to ${options.end} (step: ${step}s)\nTotal: ${result.result.length} series, ${totalDataPoints} data points`,
         );
       } catch (error) {
         handleError(error, config.serverUrl);

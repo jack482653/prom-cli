@@ -49,7 +49,7 @@ A user wants reasonable default behavior when they don't specify a step interval
 
 **Acceptance Scenarios**:
 
-1. **Given** a range query without step parameter, **When** the time range is 1 hour, **Then** the system uses a default step of 60 seconds (resulting in ~60 data points).
+1. **Given** a range query without step parameter, **When** the time range is 1 hour, **Then** the system calculates an appropriate step to target ~200 data points (e.g., ~18 seconds for 1 hour).
 2. **Given** a range query without step parameter, **When** the time range is 24 hours, **Then** the system uses a larger step to keep data points manageable.
 
 ---

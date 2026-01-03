@@ -5,6 +5,8 @@ import type {
   BuildInfo,
   Config,
   PrometheusResponse,
+  QueryRangeParams,
+  QueryRangeResult,
   QueryResult,
   ServerStatus,
   Target,
@@ -134,6 +136,31 @@ export async function query(
 
   if (response.data.status !== "success" || !response.data.data) {
     throw new Error(response.data.error || "Query failed");
+  }
+
+  return response.data.data;
+}
+
+/**
+ * Execute range PromQL query
+ */
+export async function queryRange(
+  client: AxiosInstance,
+  params: QueryRangeParams,
+): Promise<QueryRangeResult> {
+  const urlParams = new URLSearchParams();
+  urlParams.append("query", params.query);
+  urlParams.append("start", params.start.toString());
+  urlParams.append("end", params.end.toString());
+  urlParams.append("step", params.step.toString());
+
+  const response = await client.post<PrometheusResponse<QueryRangeResult>>(
+    "/api/v1/query_range",
+    urlParams,
+  );
+
+  if (response.data.status !== "success" || !response.data.data) {
+    throw new Error(response.data.error || "Range query failed");
   }
 
   return response.data.data;

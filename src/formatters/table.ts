@@ -106,3 +106,32 @@ export function formatQueryTable(
     data: results,
   });
 }
+
+/**
+ * Format matrix (range query) results as table
+ */
+export function formatMatrixTable(
+  results: Array<{
+    metric: string;
+    labels: string;
+    points: number;
+    min: string;
+    max: string;
+  }>,
+): string {
+  // Transform data to include range column
+  const dataWithRange = results.map((r) => ({
+    ...r,
+    range: `${r.min} - ${r.max}`,
+  }));
+
+  return formatTable({
+    columns: [
+      { header: "METRIC", key: "metric" },
+      { header: "LABELS", key: "labels" },
+      { header: "POINTS", key: "points" },
+      { header: "RANGE", key: "range" },
+    ],
+    data: dataWithRange,
+  });
+}

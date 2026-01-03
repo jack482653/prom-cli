@@ -20,9 +20,11 @@ This document outlines the README.md structure and content requirements for prom
 ## Installation
 
 ### pnpm (recommended)
+
 pnpm add -g prom-cli
 
 ### npm
+
 npm install -g prom-cli
 
 ## Quick Start
@@ -34,31 +36,39 @@ npm install -g prom-cli
 ## Commands
 
 ### prom config
+
 [Usage, options, example]
 
 ### prom targets
+
 [Usage, options, example with output]
 
 ### prom query
+
 [Usage, options, example with output]
 
 ### prom status
+
 [Usage, options, example with output]
 
 ## Authentication
 
 ### Basic Auth
+
 [Example]
 
 ### Bearer Token
+
 [Example]
 
 ## Output Formats
 
 ### Table (default)
+
 [Example]
 
 ### JSON
+
 [Example with --json flag]
 
 ## License
@@ -80,6 +90,7 @@ MIT
 ## Sample Output to Include
 
 Commands that should show sample output:
+
 - `prom targets` - table format showing targets
 - `prom query "up"` - vector result display
 - `prom status` - server health and version info

@@ -1,7 +1,13 @@
 import type { AxiosInstance } from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createClient, formatRelativeTime, getTargets, query } from "../src/services/prometheus.js";
+import {
+  createClient,
+  formatRelativeTime,
+  getTargets,
+  query,
+  queryRange,
+} from "../src/services/prometheus.js";
 import type { Config } from "../src/types/index.js";
 
 // Mock axios instance
@@ -270,6 +276,124 @@ describe("Prometheus Service", () => {
         const client = createClient(config);
 
         expect(client.defaults.timeout).toBe(60000);
+      });
+    });
+  });
+
+  describe("queryRange()", () => {
+    let mockClient: AxiosInstance;
+
+    beforeEach(() => {
+      mockClient = createMockAxiosInstance();
+    });
+
+    describe("Given a matrix result", () => {
+      it("should return parsed matrix data", async () => {
+        vi.mocked(mockClient.post).mockResolvedValue({
+          data: {
+            status: "success",
+            data: {
+              resultType: "matrix",
+              result: [
+                {
+                  metric: { __name__: "up", instance: "localhost:9090" },
+                  values: [
+                    [1704067200, "1"],
+                    [1704067260, "1"],
+                    [1704067320, "1"],
+                  ],
+                },
+              ],
+            },
+          },
+        });
+
+        const result = await queryRange(mockClient, {
+          query: "up",
+          start: 1704067200,
+          end: 1704070800,
+          step: 60,
+        });
+
+        expect(result.resultType).toBe("matrix");
+        expect(result.result).toHaveLength(1);
+        expect(result.result[0].values).toHaveLength(3);
+      });
+    });
+
+    describe("Given query range parameters", () => {
+      it("should include all params in request", async () => {
+        vi.mocked(mockClient.post).mockResolvedValue({
+          data: {
+            status: "success",
+            data: {
+              resultType: "matrix",
+              result: [],
+            },
+          },
+        });
+
+        await queryRange(mockClient, {
+          query: 'up{job="prometheus"}',
+          start: 1704067200,
+          end: 1704070800,
+          step: 60,
+        });
+
+        expect(mockClient.post).toHaveBeenCalledWith(
+          "/api/v1/query_range",
+          expect.any(URLSearchParams),
+        );
+
+        const params = vi.mocked(mockClient.post).mock.calls[0][1] as URLSearchParams;
+        expect(params.get("query")).toBe('up{job="prometheus"}');
+        expect(params.get("start")).toBe("1704067200");
+        expect(params.get("end")).toBe("1704070800");
+        expect(params.get("step")).toBe("60");
+      });
+    });
+
+    describe("Given an error response", () => {
+      it("should throw an error", async () => {
+        vi.mocked(mockClient.post).mockResolvedValue({
+          data: {
+            status: "error",
+            error: "parse error at char 5",
+          },
+        });
+
+        await expect(
+          queryRange(mockClient, {
+            query: "invalid{",
+            start: 1704067200,
+            end: 1704070800,
+            step: 60,
+          }),
+        ).rejects.toThrow("parse error at char 5");
+      });
+    });
+
+    describe("Given empty result", () => {
+      it("should return empty matrix", async () => {
+        vi.mocked(mockClient.post).mockResolvedValue({
+          data: {
+            status: "success",
+            data: {
+              resultType: "matrix",
+              result: [],
+            },
+          },
+        });
+
+        const result = await queryRange(mockClient, {
+          query: "nonexistent_metric",
+          start: 1704067200,
+          end: 1704070800,
+          step: 60,
+        });
+
+        expect(result.resultType).toBe("matrix");
+        expect(result.result).toHaveLength(0);
       });
     });
   });

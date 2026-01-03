@@ -40,7 +40,9 @@ SOLID 原則則是一組設計原則，有助於實現Clean Architecture。以�
 - 依賴反轉原則 (Dependency Inversion Principle — DIP)：高層次的模組不應該依賴於低層次的模組，兩者都應該依賴於抽象。在 Clean Architecture 中，這表示高層次的用例或實體不應該直接依賴低層次的實現，而應該透過介面或抽象來實現。
 
 ## Active Technologies
+
 - Markdown (GitHub Flavored Markdown) + N/A (documentation only) (002-readme)
+- N/A (uses existing config from `~/.prom-cli/config.json`) (003-query-range)
 
 - Node.js 18+ with TypeScript 5.x (ESM) + commander (CLI), axios (HTTP) (001-prom-cli-core)
 - JSON file (`~/.prom-cli/config.json`) (001-prom-cli-core)

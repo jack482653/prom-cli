@@ -43,7 +43,7 @@ prom-cli/
 
 **待實作 (Future)**
 
-- [ ] query_range - 範圍查詢（matrix 結果）
+- [x] query_range - 範圍查詢（matrix 結果）✅ 2025-01-03 完成 (PR #2)
 - [ ] series - 列出時間序列
 - [ ] labels - 列出 label 名稱與值
 - [ ] targets filter - 過濾 targets（--job, --state）

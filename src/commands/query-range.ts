@@ -31,8 +31,8 @@ function getValueRange(values: [number, string][]): { min: string; max: string }
     return { min: "N/A", max: "N/A" };
   }
 
-  const min = Math.min(...numericValues);
-  const max = Math.max(...numericValues);
+  const min = numericValues.reduce((a, b) => Math.min(a, b));
+  const max = numericValues.reduce((a, b) => Math.max(a, b));
 
   return {
     min: min.toString(),
@@ -64,8 +64,9 @@ export function createQueryRangeCommand(): Command {
       try {
         const startResult = parseTimeExpression(options.start);
         startTs = startResult.timestamp;
-      } catch {
-        console.error(`Error: Invalid start time format.
+      } catch (error) {
+        console.error(`Error: Invalid start time.
+Reason: ${error instanceof Error ? error.message : "Unknown error"}
 Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)`);
         process.exit(1);
       }
@@ -75,8 +76,9 @@ Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)`);
       try {
         const endResult = parseTimeExpression(options.end);
         endTs = endResult.timestamp;
-      } catch {
-        console.error(`Error: Invalid end time format.
+      } catch (error) {
+        console.error(`Error: Invalid end time.
+Reason: ${error instanceof Error ? error.message : "Unknown error"}
 Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)`);
         process.exit(1);
       }
@@ -117,8 +119,18 @@ End:   ${options.end}`);
 
         // Handle empty results
         if (result.result.length === 0) {
-          console.log("No data");
+          console.log(`No data found for the specified time range.
+Query: ${expression}
+Time range: ${options.start} to ${options.end}`);
           return;
+        }
+
+        // Warn for large result sets
+        const totalDataPoints = result.result.reduce((sum, r) => sum + r.values.length, 0);
+        if (totalDataPoints > 1500) {
+          console.warn(
+            `Warning: Large result set (${totalDataPoints} data points). Consider using a larger step or shorter time range.`,
+          );
         }
 
         // Format matrix results for table

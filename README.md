@@ -173,12 +173,12 @@ prom query-range <expression> --start <time> --end <time> [options]
 
 **Options:**
 
-| Option                 | Description                                        |
-| ---------------------- | -------------------------------------------------- |
-| `-s, --start <time>`   | Start time (RFC3339 or relative: 1h, 30m, now)     |
-| `-e, --end <time>`     | End time (RFC3339 or relative: 1h, 30m, now)       |
+| Option                 | Description                                             |
+| ---------------------- | ------------------------------------------------------- |
+| `-s, --start <time>`   | Start time (RFC3339 or relative: 1h, 30m, now)          |
+| `-e, --end <time>`     | End time (RFC3339 or relative: 1h, 30m, now)            |
 | `-p, --step <seconds>` | Resolution step in seconds (auto-calculated if omitted) |
-| `-j, --json`           | Output as JSON (includes all timestamps and values) |
+| `-j, --json`           | Output as JSON (includes all timestamps and values)     |
 
 **Output Formats:**
 
@@ -209,13 +209,13 @@ prom query-range "up" --start "5m" --end "now" --json
 
 **Relative Time Formats:**
 
-| Format | Meaning           |
-| ------ | ----------------- |
-| `now`  | Current time      |
-| `30s`  | 30 seconds ago    |
-| `5m`   | 5 minutes ago     |
-| `1h`   | 1 hour ago        |
-| `7d`   | 7 days ago        |
+| Format | Meaning        |
+| ------ | -------------- |
+| `now`  | Current time   |
+| `30s`  | 30 seconds ago |
+| `5m`   | 5 minutes ago  |
+| `1h`   | 1 hour ago     |
+| `7d`   | 7 days ago     |
 
 ### prom status
 

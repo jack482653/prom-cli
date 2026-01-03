@@ -75,13 +75,13 @@ prom config --show
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-u, --username <user>` | Basic auth username |
-| `-p, --password <pass>` | Basic auth password |
-| `-t, --token <token>` | Bearer token |
-| `--timeout <ms>` | Request timeout in milliseconds |
-| `-s, --show` | Show current configuration |
+| Option                  | Description                     |
+| ----------------------- | ------------------------------- |
+| `-u, --username <user>` | Basic auth username             |
+| `-p, --password <pass>` | Basic auth password             |
+| `-t, --token <token>`   | Bearer token                    |
+| `--timeout <ms>`        | Request timeout in milliseconds |
+| `-s, --show`            | Show current configuration      |
 
 **Examples:**
 
@@ -112,8 +112,8 @@ prom targets [options]
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
+| Option       | Description    |
+| ------------ | -------------- |
 | `-j, --json` | Output as JSON |
 
 **Example:**
@@ -135,9 +135,9 @@ prom query <expression> [options]
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
-| `-j, --json` | Output as JSON |
+| Option            | Description                            |
+| ----------------- | -------------------------------------- |
+| `-j, --json`      | Output as JSON                         |
 | `-t, --time <ts>` | Evaluation timestamp (RFC3339 or Unix) |
 
 **Examples:**
@@ -172,8 +172,8 @@ prom status [options]
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
+| Option       | Description    |
+| ------------ | -------------- |
 | `-j, --json` | Output as JSON |
 
 **Example:**

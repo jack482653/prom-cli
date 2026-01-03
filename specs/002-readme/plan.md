@@ -23,14 +23,14 @@ Create comprehensive README.md documentation for prom-cli, enabling new users to
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle                    | Status    | Notes                                               |
-| ---------------------------- | --------- | --------------------------------------------------- |
-| I. Code Quality              | N/A       | Documentation only - no code changes                |
-| II. Testing Standards        | N/A       | No tests required for markdown documentation        |
-| III. User Experience         | ✅ Pass   | README directly improves UX by providing clear docs |
-| IV. Performance Requirements | N/A       | No runtime code                                     |
-| V. MVP First                 | ✅ Pass   | Minimal README covering essential usage             |
-| VI. No Overdesign            | ✅ Pass   | Simple markdown file, no documentation generators   |
+| Principle                    | Status  | Notes                                               |
+| ---------------------------- | ------- | --------------------------------------------------- |
+| I. Code Quality              | N/A     | Documentation only - no code changes                |
+| II. Testing Standards        | N/A     | No tests required for markdown documentation        |
+| III. User Experience         | ✅ Pass | README directly improves UX by providing clear docs |
+| IV. Performance Requirements | N/A     | No runtime code                                     |
+| V. MVP First                 | ✅ Pass | Minimal README covering essential usage             |
+| VI. No Overdesign            | ✅ Pass | Simple markdown file, no documentation generators   |
 
 **Gate Result**: PASS - proceed to implementation
 
@@ -82,6 +82,7 @@ Based on spec.md requirements, the README will contain:
 ## Next Step
 
 This feature can skip `/speckit.tasks` - proceed directly to writing README.md since:
+
 - Single file output
 - No code implementation
 - No tests required

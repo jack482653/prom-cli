@@ -34,7 +34,7 @@ describe("Labels Service", () => {
         const labels = await getLabels(mockClient);
 
         expect(labels).toEqual(["__name__", "instance", "job", "method", "status_code"]);
-        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/labels");
+        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/labels", { params: {} });
       });
     });
 
@@ -78,9 +78,9 @@ describe("Labels Service", () => {
 
         await getLabels(mockClient, 1704067200, 1704070800);
 
-        expect(mockClient.get).toHaveBeenCalledWith(
-          "/api/v1/labels?start=1704067200&end=1704070800",
-        );
+        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/labels", {
+          params: { start: "1704067200", end: "1704070800" },
+        });
       });
     });
 
@@ -95,7 +95,9 @@ describe("Labels Service", () => {
 
         await getLabels(mockClient, 1704067200);
 
-        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/labels?start=1704067200");
+        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/labels", {
+          params: { start: "1704067200" },
+        });
       });
     });
   });
@@ -116,7 +118,7 @@ describe("Labels Service", () => {
         const values = await getLabelValues(mockClient, "job");
 
         expect(values).toEqual(["prometheus", "node_exporter", "alertmanager"]);
-        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/label/job/values");
+        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/label/job/values", { params: {} });
       });
     });
 
@@ -160,9 +162,9 @@ describe("Labels Service", () => {
 
         await getLabelValues(mockClient, "job", 1704067200, 1704070800);
 
-        expect(mockClient.get).toHaveBeenCalledWith(
-          "/api/v1/label/job/values?start=1704067200&end=1704070800",
-        );
+        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/label/job/values", {
+          params: { start: "1704067200", end: "1704070800" },
+        });
       });
     });
 
@@ -175,9 +177,11 @@ describe("Labels Service", () => {
           },
         });
 
-        await getLabelValues(mockClient, "__name__");
+        await getLabelValues(mockClient, "foo/bar");
 
-        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/label/__name__/values");
+        expect(mockClient.get).toHaveBeenCalledWith("/api/v1/label/foo%2Fbar/values", {
+          params: {},
+        });
       });
     });
   });

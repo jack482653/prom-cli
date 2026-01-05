@@ -222,16 +222,15 @@ export async function getLabels(
   start?: number,
   end?: number,
 ): Promise<string[]> {
-  const params = new URLSearchParams();
+  const params: Record<string, string> = {};
   if (start !== undefined) {
-    params.append("start", start.toString());
+    params.start = start.toString();
   }
   if (end !== undefined) {
-    params.append("end", end.toString());
+    params.end = end.toString();
   }
 
-  const url = params.toString() ? `/api/v1/labels?${params.toString()}` : "/api/v1/labels";
-  const response = await client.get<LabelsResult>(url);
+  const response = await client.get<LabelsResult>("/api/v1/labels", { params });
 
   if (response.data.status !== "success" || !response.data.data) {
     throw new Error(response.data.error || "Failed to get labels");
@@ -249,18 +248,16 @@ export async function getLabelValues(
   start?: number,
   end?: number,
 ): Promise<string[]> {
-  const params = new URLSearchParams();
+  const params: Record<string, string> = {};
   if (start !== undefined) {
-    params.append("start", start.toString());
+    params.start = start.toString();
   }
   if (end !== undefined) {
-    params.append("end", end.toString());
+    params.end = end.toString();
   }
 
-  const url = params.toString()
-    ? `/api/v1/label/${encodeURIComponent(labelName)}/values?${params.toString()}`
-    : `/api/v1/label/${encodeURIComponent(labelName)}/values`;
-  const response = await client.get<LabelsResult>(url);
+  const url = `/api/v1/label/${encodeURIComponent(labelName)}/values`;
+  const response = await client.get<LabelsResult>(url, { params });
 
   if (response.data.status !== "success" || !response.data.data) {
     throw new Error(response.data.error || "Failed to get label values");

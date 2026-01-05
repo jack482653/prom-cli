@@ -38,18 +38,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T005 [P] [US1] Test getLabels() returns label names array in tests/labels.test.ts
-- [ ] T006 [P] [US1] Test labels command outputs list format in tests/labels.test.ts
-- [ ] T007 [P] [US1] Test labels command outputs JSON format with --json in tests/labels.test.ts
-- [ ] T008 [P] [US1] Test labels command shows error when no config in tests/labels.test.ts
+- [x] T005 [P] [US1] Test getLabels() returns label names array in tests/labels.test.ts
+- [x] T006 [P] [US1] Test labels command outputs list format in tests/labels.test.ts
+- [x] T007 [P] [US1] Test labels command outputs JSON format with --json in tests/labels.test.ts
+- [x] T008 [P] [US1] Test labels command shows error when no config in tests/labels.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Create labels command handler in src/commands/labels.ts
-- [ ] T010 [US1] Implement list output format for label names in src/commands/labels.ts
-- [ ] T011 [US1] Implement JSON output format for label names in src/commands/labels.ts
-- [ ] T012 [US1] Add error handling for no config and connection failures in src/commands/labels.ts
-- [ ] T013 [US1] Register labels command in src/index.ts
+- [x] T009 [US1] Create labels command handler in src/commands/labels.ts
+- [x] T010 [US1] Implement list output format for label names in src/commands/labels.ts
+- [x] T011 [US1] Implement JSON output format for label names in src/commands/labels.ts
+- [x] T012 [US1] Add error handling for no config and connection failures in src/commands/labels.ts
+- [x] T013 [US1] Register labels command in src/index.ts
 
 **Checkpoint**: `prom labels` works with list and JSON output. MVP complete.
 
@@ -63,17 +63,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [P] [US2] Test getLabelValues() returns values array in tests/labels.test.ts
-- [ ] T015 [P] [US2] Test labels command with label argument outputs values in tests/labels.test.ts
-- [ ] T016 [P] [US2] Test labels command with label argument outputs JSON with --json in tests/labels.test.ts
-- [ ] T017 [P] [US2] Test labels command handles empty results for nonexistent label in tests/labels.test.ts
+- [x] T014 [P] [US2] Test getLabelValues() returns values array in tests/labels.test.ts
+- [x] T015 [P] [US2] Test labels command with label argument outputs values in tests/labels.test.ts
+- [x] T016 [P] [US2] Test labels command with label argument outputs JSON with --json in tests/labels.test.ts
+- [x] T017 [P] [US2] Test labels command handles empty results for nonexistent label in tests/labels.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Add label_name argument handling to src/commands/labels.ts
-- [ ] T019 [US2] Implement list output format for label values in src/commands/labels.ts
-- [ ] T020 [US2] Implement JSON output format for label values in src/commands/labels.ts
-- [ ] T021 [US2] Add empty result message for label values in src/commands/labels.ts
+- [x] T018 [US2] Add label_name argument handling to src/commands/labels.ts
+- [x] T019 [US2] Implement list output format for label values in src/commands/labels.ts
+- [x] T020 [US2] Implement JSON output format for label values in src/commands/labels.ts
+- [x] T021 [US2] Add empty result message for label values in src/commands/labels.ts
 
 **Checkpoint**: `prom labels <label_name>` works. Stories 1 and 2 complete.
 
@@ -87,17 +87,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T022 [P] [US3] Test getLabels() accepts start/end parameters in tests/labels.test.ts
-- [ ] T023 [P] [US3] Test getLabelValues() accepts start/end parameters in tests/labels.test.ts
-- [ ] T024 [P] [US3] Test time parsing integration (RFC3339 and relative) in tests/labels.test.ts
-- [ ] T025 [P] [US3] Test invalid time range error handling in tests/labels.test.ts
+- [x] T022 [P] [US3] Test getLabels() accepts start/end parameters in tests/labels.test.ts
+- [x] T023 [P] [US3] Test getLabelValues() accepts start/end parameters in tests/labels.test.ts
+- [x] T024 [P] [US3] Test time parsing integration (RFC3339 and relative) in tests/labels.test.ts
+- [x] T025 [P] [US3] Test invalid time range error handling in tests/labels.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Add --start and --end options to labels command in src/commands/labels.ts
-- [ ] T027 [US3] Integrate time-parser.ts for parsing time expressions in src/commands/labels.ts
-- [ ] T028 [US3] Pass start/end timestamps to API functions in src/commands/labels.ts
-- [ ] T029 [US3] Add time range validation (start < end) in src/commands/labels.ts
+- [x] T026 [US3] Add --start and --end options to labels command in src/commands/labels.ts
+- [x] T027 [US3] Integrate time-parser.ts for parsing time expressions in src/commands/labels.ts
+- [x] T028 [US3] Pass start/end timestamps to API functions in src/commands/labels.ts
+- [x] T029 [US3] Add time range validation (start < end) in src/commands/labels.ts
 
 **Checkpoint**: All user stories complete. Full feature ready.
 
@@ -107,7 +107,7 @@
 
 **Purpose**: Final validation and documentation
 
-- [ ] T030 Run all tests and ensure they pass
+- [x] T030 Run all tests and ensure they pass
 - [ ] T031 Validate quickstart.md examples work correctly
 - [ ] T032 Update THOUGHTS.md with implementation notes
 

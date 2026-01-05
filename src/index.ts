@@ -2,6 +2,7 @@
 import { Command } from "commander";
 
 import { createConfigCommand } from "./commands/config.js";
+import { createLabelsCommand } from "./commands/labels.js";
 import { createQueryRangeCommand } from "./commands/query-range.js";
 import { createQueryCommand } from "./commands/query.js";
 import { createStatusCommand } from "./commands/status.js";
@@ -19,6 +20,7 @@ program.addCommand(createConfigCommand());
 program.addCommand(createTargetsCommand());
 program.addCommand(createQueryCommand());
 program.addCommand(createQueryRangeCommand());
+program.addCommand(createLabelsCommand());
 program.addCommand(createStatusCommand());
 
 program.parse();

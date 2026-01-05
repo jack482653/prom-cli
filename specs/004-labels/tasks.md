@@ -108,8 +108,8 @@
 **Purpose**: Final validation and documentation
 
 - [x] T030 Run all tests and ensure they pass
-- [ ] T031 Validate quickstart.md examples work correctly
-- [ ] T032 Update THOUGHTS.md with implementation notes
+- [x] T031 Validate quickstart.md examples work correctly
+- [x] T032 Update THOUGHTS.md with implementation notes
 
 ---
 

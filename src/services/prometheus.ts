@@ -4,6 +4,7 @@ import type {
   ActiveTarget,
   BuildInfo,
   Config,
+  LabelsResult,
   PrometheusResponse,
   QueryRangeParams,
   QueryRangeResult,
@@ -211,4 +212,56 @@ export function formatRelativeTime(date: Date): string {
 
   const diffDay = Math.floor(diffHour / 24);
   return `${diffDay}d ago`;
+}
+
+/**
+ * Get all label names from Prometheus
+ */
+export async function getLabels(
+  client: AxiosInstance,
+  start?: number,
+  end?: number,
+): Promise<string[]> {
+  const params: Record<string, string> = {};
+  if (start !== undefined) {
+    params.start = start.toString();
+  }
+  if (end !== undefined) {
+    params.end = end.toString();
+  }
+
+  const response = await client.get<LabelsResult>("/api/v1/labels", { params });
+
+  if (response.data.status !== "success" || !response.data.data) {
+    throw new Error(response.data.error || "Failed to get labels");
+  }
+
+  return response.data.data;
+}
+
+/**
+ * Get all values for a specific label from Prometheus
+ */
+export async function getLabelValues(
+  client: AxiosInstance,
+  labelName: string,
+  start?: number,
+  end?: number,
+): Promise<string[]> {
+  const params: Record<string, string> = {};
+  if (start !== undefined) {
+    params.start = start.toString();
+  }
+  if (end !== undefined) {
+    params.end = end.toString();
+  }
+
+  const url = `/api/v1/label/${encodeURIComponent(labelName)}/values`;
+  const response = await client.get<LabelsResult>(url, { params });
+
+  if (response.data.status !== "success" || !response.data.data) {
+    throw new Error(response.data.error || "Failed to get label values");
+  }
+
+  return response.data.data;
 }

@@ -39,7 +39,69 @@ SOLID 原則則是一組設計原則，有助於實現Clean Architecture。以�
 
 - 依賴反轉原則 (Dependency Inversion Principle — DIP)：高層次的模組不應該依賴於低層次的模組，兩者都應該依賴於抽象。在 Clean Architecture 中，這表示高層次的用例或實體不應該直接依賴低層次的實現，而應該透過介面或抽象來實現。
 
+## 可用工具
+
+### GitHub Pull Request Review 回覆
+
+當需要回覆 PR review comments 時：
+
+```bash
+# 回覆 PR review comment (在 conversation thread 中回覆)
+gh api -X POST repos/:owner/:repo/pulls/:pr_number/comments \
+  -F body="回覆內容" \
+  -F in_reply_to=:comment_id
+
+# 範例
+gh api -X POST repos/jack482653/prom-cli/pulls/3/comments \
+  -F body="已修正，commit 63842eb" \
+  -F in_reply_to=2660628000
+```
+
+**注意：**
+- 必須使用 `-F` (form data) 而非 `-f` (raw field)
+- `in_reply_to` 是 comment ID (從 review comments API 取得)
+- 這會在 conversation thread 中新增回覆，而非獨立的 comment
+- 如果是回覆 gemini-code-assist 的 review comment，請在回覆內容的最開頭加上 @gemini-code-assist (不要用反引號) 以通知對方
+
+### 解決 (Resolve) Review Thread
+
+```bash
+# 使用 GraphQL API 解決 review thread
+gh api graphql -f query='
+mutation {
+  resolveReviewThread(input: {threadId: "PRRT_xxxxx"}) {
+    thread { id isResolved }
+  }
+}'
+
+# 批次解決多個 threads
+gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "PRRT_xxx1"}) { thread { id } } }' && \
+gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "PRRT_xxx2"}) { thread { id } } }'
+```
+
+**注意：**
+- `threadId` 格式為 `PRRT_xxxxx` (從 review comments API 的 `ID` 欄位取得)
+- 解決後該 thread 會被標記為 resolved 並收合
+
+### 取得 PR Review Comments
+
+```bash
+# 使用 MCP GitHub tool
+mcp__github__pull_request_read(
+  method: "get_review_comments",
+  owner: "jack482653",
+  repo: "prom-cli",
+  pullNumber: 3
+)
+```
+
+回傳的 `reviewThreads` 包含：
+- `ID`: Thread ID (用於 resolve)
+- `Comments.Nodes[].ID`: Comment ID (用於 in_reply_to)
+- `IsResolved`: 是否已解決
+
 ## Active Technologies
+- TypeScript 5.x (ES2022, NodeNext modules) + commander (CLI), axios (HTTP) (004-labels)
 
 - Markdown (GitHub Flavored Markdown) + N/A (documentation only) (002-readme)
 - N/A (uses existing config from `~/.prom-cli/config.json`) (003-query-range)

@@ -140,3 +140,23 @@ export interface TimeParseResult {
   timestamp: number; // Unix epoch seconds
   isRelative: boolean; // Whether the input was a relative expression
 }
+
+/**
+ * CLI options for labels command
+ */
+export interface LabelsOptions {
+  json?: boolean; // Optional: JSON output flag
+  start?: string; // Optional: start time expression
+  end?: string; // Optional: end time expression
+}
+
+/**
+ * Result from labels API endpoints
+ * Source: /api/v1/labels and /api/v1/label/<name>/values
+ */
+export interface LabelsResult {
+  status: "success" | "error";
+  data: string[];
+  error?: string;
+  errorType?: string;
+}

@@ -44,8 +44,8 @@ prom-cli/
 **待實作 (Future)**
 
 - [x] query_range - 範圍查詢（matrix 結果）✅ 2025-01-03 完成 (PR #2)
+- [x] labels - 列出 label 名稱與值 ✅ 2025-01-05 完成
 - [ ] series - 列出時間序列
-- [ ] labels - 列出 label 名稱與值
 - [ ] targets filter - 過濾 targets（--job, --state）
 
 ## 2024-12-31 專案憲章與規格
@@ -123,3 +123,35 @@ prom-cli/
 - vitest 作為測試框架
 - 49 個單元測試全部通過
 - 涵蓋：URL 驗證、配置管理、API 客戶端、格式化輸出
+
+## 2025-01-05 Labels 功能實作
+
+### 實作概要
+
+- 執行 `/speckit.specify` 建立 004-labels 規格
+- 執行 `/speckit.plan` 建立實作計畫
+- 執行 `/speckit.tasks` 生成 32 個任務
+- 執行 `/speckit.implement` 完成所有功能
+
+### 完成的功能
+
+- `prom labels` - 列出所有 label 名稱
+- `prom labels <name>` - 列出特定 label 的所有值
+- `--json` 支援 JSON 輸出格式
+- `--start` / `--end` 支援時間範圍過濾
+
+### API 端點
+
+- `/api/v1/labels` - 取得所有 label 名稱
+- `/api/v1/label/<name>/values` - 取得特定 label 的值
+
+### 技術決策
+
+- 重用 time-parser.ts 處理時間表達式
+- 遵循現有 command 模式（query.ts 作為參考）
+- 輸出格式：簡單列表（非表格），符合 label 為純字串的特性
+
+### 測試覆蓋
+
+- 10 個新測試涵蓋 API 函數
+- 總測試數量：102 個全部通過

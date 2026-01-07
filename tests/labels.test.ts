@@ -1,6 +1,11 @@
 import type { AxiosInstance } from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  InvalidTimeExpressionError,
+  InvalidTimeRangeError,
+  parseTimeRange,
+} from "../src/commands/labels.js";
 import { getLabels, getLabelValues } from "../src/services/prometheus.js";
 
 // Mock axios instance
@@ -183,6 +188,61 @@ describe("Labels Service", () => {
           params: {},
         });
       });
+    });
+  });
+});
+
+// =============================================================================
+// parseTimeRange() tests
+// =============================================================================
+describe("parseTimeRange()", () => {
+  describe("Given invalid start time", () => {
+    it("should throw InvalidTimeExpressionError", () => {
+      expect(() => parseTimeRange({ start: "invalid" })).toThrow(InvalidTimeExpressionError);
+      expect(() => parseTimeRange({ start: "invalid" })).toThrow(
+        "Invalid start time. Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)",
+      );
+    });
+  });
+
+  describe("Given invalid end time", () => {
+    it("should throw InvalidTimeExpressionError", () => {
+      expect(() => parseTimeRange({ end: "invalid" })).toThrow(InvalidTimeExpressionError);
+      expect(() => parseTimeRange({ end: "invalid" })).toThrow(
+        "Invalid end time. Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)",
+      );
+    });
+  });
+
+  describe("Given start time after end time", () => {
+    it("should throw InvalidTimeRangeError", () => {
+      const start = "2024-01-02T00:00:00Z";
+      const end = "2024-01-01T00:00:00Z";
+
+      expect(() => parseTimeRange({ start, end })).toThrow(InvalidTimeRangeError);
+      expect(() => parseTimeRange({ start, end })).toThrow("Start time must be before end time.");
+    });
+  });
+
+  describe("Given valid time range", () => {
+    it("should return parsed timestamps", () => {
+      const start = "2024-01-01T00:00:00Z";
+      const end = "2024-01-02T00:00:00Z";
+
+      const result = parseTimeRange({ start, end });
+
+      expect(result.start).toBeDefined();
+      expect(result.end).toBeDefined();
+      expect(result.start).toBeLessThan(result.end!);
+    });
+  });
+
+  describe("Given no time options", () => {
+    it("should return empty object", () => {
+      const result = parseTimeRange({});
+
+      expect(result.start).toBeUndefined();
+      expect(result.end).toBeUndefined();
     });
   });
 });

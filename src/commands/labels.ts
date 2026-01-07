@@ -12,40 +12,54 @@ import {
 import { parseTimeExpression } from "../services/time-parser.js";
 import type { LabelsOptions } from "../types/index.js";
 
+export class InvalidTimeExpressionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidTimeExpressionError";
+  }
+}
+
+export class InvalidTimeRangeError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidTimeRangeError";
+  }
+}
+
 /**
  * Parse and validate time range options
  * Returns { start, end } as Unix timestamps or undefined if not specified
+ * Throws InvalidTimeExpressionError or InvalidTimeRangeError on validation failure
  */
-function parseTimeRange(options: LabelsOptions): { start?: number; end?: number } {
+export function parseTimeRange(options: LabelsOptions): { start?: number; end?: number } {
   let start: number | undefined;
   let end: number | undefined;
 
   if (options.start) {
-    const parsed = parseTimeExpression(options.start);
-    if (!parsed) {
-      console.error(
-        "Error: Invalid start time. Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)",
+    try {
+      const parsed = parseTimeExpression(options.start);
+      start = parsed.timestamp;
+    } catch (error) {
+      throw new InvalidTimeExpressionError(
+        "Invalid start time. Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)",
       );
-      process.exit(1);
     }
-    start = parsed.timestamp;
   }
 
   if (options.end) {
-    const parsed = parseTimeExpression(options.end);
-    if (!parsed) {
-      console.error(
-        "Error: Invalid end time. Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)",
+    try {
+      const parsed = parseTimeExpression(options.end);
+      end = parsed.timestamp;
+    } catch (error) {
+      throw new InvalidTimeExpressionError(
+        "Invalid end time. Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)",
       );
-      process.exit(1);
     }
-    end = parsed.timestamp;
   }
 
   // Validate time range
   if (start !== undefined && end !== undefined && start >= end) {
-    console.error("Error: Start time must be before end time.");
-    process.exit(1);
+    throw new InvalidTimeRangeError("Start time must be before end time.");
   }
 
   return { start, end };

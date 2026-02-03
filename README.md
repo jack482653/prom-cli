@@ -8,6 +8,8 @@ A command-line tool for querying Prometheus from your terminal.
 - Execute PromQL instant queries
 - Execute PromQL range queries with relative time support (1h, 30m, now)
 - List scrape targets and their health status
+- List label names and values with time range filtering
+- Query time series by label matchers
 - Check server health and version information
 - Table and JSON output formats
 
@@ -216,6 +218,96 @@ prom query-range "up" --start "5m" --end "now" --json
 | `5m`   | 5 minutes ago  |
 | `1h`   | 1 hour ago     |
 | `7d`   | 7 days ago     |
+
+### prom labels
+
+List label names or values for a specific label.
+
+```bash
+prom labels [label_name] [options]
+```
+
+**Options:**
+
+| Option               | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `-j, --json`         | Output as JSON                                 |
+| `-s, --start <time>` | Start time (RFC3339 or relative: 1h, 30m, now) |
+| `-e, --end <time>`   | End time (RFC3339 or relative: 1h, 30m, now)   |
+
+**Examples:**
+
+```bash
+# List all label names
+$ prom labels
+__name__
+instance
+job
+method
+status_code
+
+Total: 5 labels
+
+# List values for a specific label
+$ prom labels job
+prometheus
+node_exporter
+alertmanager
+
+Total: 3 values for "job"
+
+# List labels with time range filtering
+prom labels --start "1h" --end "now"
+
+# List label values with time range
+prom labels job --start "2024-01-01T00:00:00Z" --end "2024-01-02T00:00:00Z"
+
+# Output as JSON
+prom labels --json
+prom labels job --json
+```
+
+### prom series
+
+Query time series matching label selectors.
+
+```bash
+prom series <matchers...> [options]
+```
+
+**Options:**
+
+| Option               | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `-j, --json`         | Output as JSON                                 |
+| `-s, --start <time>` | Start time (RFC3339 or relative: 1h, 30m, now) |
+| `-e, --end <time>`   | End time (RFC3339 or relative: 1h, 30m, now)   |
+
+**Examples:**
+
+```bash
+# Query series with single matcher
+$ prom series up
+{__name__="up", job="prometheus", instance="localhost:9090"}
+{__name__="up", job="node_exporter", instance="localhost:9100"}
+
+Total: 2 series
+
+# Query with label selector
+prom series '{job="prometheus"}'
+
+# Query with multiple matchers (OR logic)
+prom series up '{job="node_exporter"}'
+
+# Query with time range filtering
+prom series up --start "1h" --end "now"
+
+# Query with absolute timestamps
+prom series up --start "2024-01-01T00:00:00Z" --end "2024-01-02T00:00:00Z"
+
+# Output as JSON
+prom series up --json
+```
 
 ### prom status
 

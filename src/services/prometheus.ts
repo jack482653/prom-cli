@@ -4,6 +4,7 @@ import type {
   ActiveTarget,
   BuildInfo,
   Config,
+  LabelSet,
   LabelsResult,
   PrometheusResponse,
   QueryRangeParams,
@@ -264,4 +265,42 @@ export async function getLabelValues(
   }
 
   return response.data.data;
+}
+
+/**
+ * Result from series API endpoint
+ */
+interface SeriesResult {
+  status: "success" | "error";
+  data?: LabelSet[];
+  error?: string;
+  errorType?: string;
+}
+
+/**
+ * Get time series matching label selectors from Prometheus
+ */
+export async function getSeries(
+  client: AxiosInstance,
+  matchers: string[],
+  start?: number,
+  end?: number,
+): Promise<LabelSet[]> {
+  const params: Record<string, any> = {
+    "match[]": matchers,
+  };
+  if (start !== undefined) {
+    params.start = start.toString();
+  }
+  if (end !== undefined) {
+    params.end = end.toString();
+  }
+
+  const response = await client.get<SeriesResult>("/api/v1/series", { params });
+
+  if (response.data.status !== "success") {
+    throw new Error(response.data.error || "Failed to get series");
+  }
+
+  return response.data.data || [];
 }

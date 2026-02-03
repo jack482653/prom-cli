@@ -155,3 +155,46 @@ prom-cli/
 
 - 10 個新測試涵蓋 API 函數
 - 總測試數量：102 個全部通過
+
+## 2025-01-09 Series 功能實作
+
+### 實作概要
+
+- 執行 `/speckit.specify` 建立 005-series 規格
+- 執行 `/speckit.plan` 建立實作計畫
+- 執行 `/speckit.tasks` 生成 41 個任務（5 個階段）
+- 執行 `/speckit.implement` 完成所有功能
+
+### 完成的功能
+
+- `prom series <matchers...>` - 查詢符合 label matchers 的時間序列
+- 支援多個 matchers（邏輯 OR 組合）
+- `--start` / `--end` 支援時間範圍過濾（RFC3339 或相對時間）
+- `--json` 支援 JSON 輸出格式
+- 錯誤處理：無 matcher、無設定、連線失敗、API 錯誤
+
+### API 端點
+
+- `/api/v1/series` - 查詢時間序列，使用 `match[]` 參數
+
+### 技術決策
+
+- 重用 labels 命令的 parseTimeRange() 模式
+- 重用 time-parser.ts 處理時間表達式
+- 使用 formatLabelSet() 將 label set 格式化為 `{key="value", ...}` 格式
+- 輸出格式：人類可讀列表（預設）或 JSON（--json）
+- variadic arguments 處理多個 matchers
+
+### 實作效率
+
+- Phase 1 (Setup): 完成型別定義和 API 方法（3 個任務）
+- Phase 2 (MVP): 完成核心功能，包含測試和實作（14 個任務）
+- Phase 3-4: 時間過濾和 JSON 輸出已在 Phase 2 實作，只需補測試
+- Phase 5 (Polish): 測試、格式化、文檔更新（5 個任務）
+- 效率提升：同時實作多個 user story 的功能，減少重工
+
+### 測試覆蓋
+
+- 14 個新測試涵蓋 getSeries() API 和時間解析功能
+- 總測試數量：121 個全部通過
+- 測試涵蓋：單一/多個 matchers、空結果、錯誤處理、時間範圍驗證

@@ -4,6 +4,7 @@ import type {
   ActiveTarget,
   BuildInfo,
   Config,
+  LabelSet,
   LabelsResult,
   PrometheusResponse,
   QueryRangeParams,
@@ -71,7 +72,8 @@ export function createClient(config: Config): AxiosInstance {
 }
 
 /**
- * Handle axios errors with user-friendly messages
+ * Handle errors with user-friendly messages
+ * Handles both AxiosError (network/API errors) and custom Error types (validation errors)
  */
 export function handleError(error: unknown, serverUrl: string): never {
   if (error instanceof AxiosError) {
@@ -94,6 +96,14 @@ export function handleError(error: unknown, serverUrl: string): never {
     process.exit(2);
   }
 
+  // Handle custom Error types (e.g., InvalidTimeExpressionError, InvalidTimeRangeError)
+  // These errors already have user-friendly messages, so we just display them
+  if (error instanceof Error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+
+  // Unknown error type - re-throw to show stack trace for debugging
   throw error;
 }
 
@@ -264,4 +274,42 @@ export async function getLabelValues(
   }
 
   return response.data.data;
+}
+
+/**
+ * Result from series API endpoint
+ */
+interface SeriesResult {
+  status: "success" | "error";
+  data?: LabelSet[];
+  error?: string;
+  errorType?: string;
+}
+
+/**
+ * Get time series matching label selectors from Prometheus
+ */
+export async function getSeries(
+  client: AxiosInstance,
+  matchers: string[],
+  start?: number,
+  end?: number,
+): Promise<LabelSet[]> {
+  const params: Record<string, any> = {
+    "match[]": matchers,
+  };
+  if (start !== undefined) {
+    params.start = start.toString();
+  }
+  if (end !== undefined) {
+    params.end = end.toString();
+  }
+
+  const response = await client.get<SeriesResult>("/api/v1/series", { params });
+
+  if (response.data.status !== "success") {
+    throw new Error(response.data.error || "Failed to get series");
+  }
+
+  return response.data.data || [];
 }

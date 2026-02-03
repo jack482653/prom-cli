@@ -160,3 +160,18 @@ export interface LabelsResult {
   error?: string;
   errorType?: string;
 }
+
+/**
+ * CLI options for series command
+ */
+export interface SeriesOptions {
+  json?: boolean; // Optional: JSON output flag
+  start?: string; // Optional: start time expression
+  end?: string; // Optional: end time expression
+}
+
+/**
+ * Label set representing a single time series
+ * A time series is identified by a unique set of label key-value pairs
+ */
+export type LabelSet = Record<string, string>;

@@ -6,7 +6,7 @@ import {
   InvalidTimeRangeError,
   parseTimeRange,
 } from "../src/commands/labels.js";
-import { getLabels, getLabelValues } from "../src/services/prometheus.js";
+import { getLabelValues, getLabels } from "../src/services/prometheus.js";
 
 // Mock axios instance
 const createMockAxiosInstance = () =>

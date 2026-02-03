@@ -58,6 +58,7 @@ gh api -X POST repos/jack482653/prom-cli/pulls/3/comments \
 ```
 
 **注意：**
+
 - 必須使用 `-F` (form data) 而非 `-f` (raw field)
 - `in_reply_to` 是 comment ID (從 review comments API 取得)
 - 這會在 conversation thread 中新增回覆，而非獨立的 comment
@@ -80,6 +81,7 @@ gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "PRRT_
 ```
 
 **注意：**
+
 - `threadId` 格式為 `PRRT_xxxxx` (從 review comments API 的 `ID` 欄位取得)
 - 解決後該 thread 會被標記為 resolved 並收合
 
@@ -96,11 +98,13 @@ mcp__github__pull_request_read(
 ```
 
 回傳的 `reviewThreads` 包含：
+
 - `ID`: Thread ID (用於 resolve)
 - `Comments.Nodes[].ID`: Comment ID (用於 in_reply_to)
 - `IsResolved`: 是否已解決
 
 ## Active Technologies
+
 - TypeScript 5.x (ES2022, NodeNext modules) + commander (CLI), axios (HTTP) (004-labels)
 
 - Markdown (GitHub Flavored Markdown) + N/A (documentation only) (002-readme)

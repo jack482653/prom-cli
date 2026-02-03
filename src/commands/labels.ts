@@ -5,8 +5,8 @@ import { loadConfig } from "../services/config.js";
 import {
   ErrorMessages,
   createClient,
-  getLabels,
   getLabelValues,
+  getLabels,
   handleError,
 } from "../services/prometheus.js";
 import { parseTimeExpression } from "../services/time-parser.js";

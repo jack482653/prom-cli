@@ -139,6 +139,7 @@
 ### Parallel Opportunities
 
 **Phase 1 (Setup)**:
+
 ```bash
 # T001 and T002 can run in parallel (different type additions)
 Task: T001 [P] Add LabelsOptions interface
@@ -146,6 +147,7 @@ Task: T002 [P] Add LabelsResult type
 ```
 
 **Phase 2 (US1 Tests)**:
+
 ```bash
 # All US1 tests can run in parallel
 Task: T005 [P] Test getLabels() returns label names
@@ -155,6 +157,7 @@ Task: T008 [P] Test labels command shows error when no config
 ```
 
 **Phase 3 (US2 Tests)**:
+
 ```bash
 # All US2 tests can run in parallel
 Task: T014 [P] Test getLabelValues() returns values array
@@ -164,6 +167,7 @@ Task: T017 [P] Test empty results handling
 ```
 
 **Phase 4 (US3 Tests)**:
+
 ```bash
 # All US3 tests can run in parallel
 Task: T022 [P] Test getLabels() with start/end
@@ -198,5 +202,5 @@ Task: T025 [P] Test invalid time range error
 - [P] tasks = different files or independent test cases
 - [Story] label maps task to specific user story for traceability
 - Reuse existing `time-parser.ts` for US3 (no new time parsing code)
-- Follow existing patterns in prometheus.ts and commands/*.ts
+- Follow existing patterns in prometheus.ts and commands/\*.ts
 - Commit after each task per constitution (Git Commit Standards v1.2.0)

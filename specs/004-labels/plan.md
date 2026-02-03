@@ -23,14 +23,14 @@ Implement `prom labels` command to list Prometheus label names and values. This 
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Code Quality | PASS | Will follow existing patterns, use prettier, single responsibility |
-| II. Testing (TDD/BDD) | PASS | Tests written before implementation, BDD scenarios from spec |
-| III. UX Consistency | PASS | Consistent with existing commands: --json, --help, error messages |
-| IV. Performance | PASS | <2s goal aligns with 100ms init + network time |
-| V. MVP First | PASS | P1 (list names) → P2 (list values) → P3 (time filter) |
-| VI. No Overdesign | PASS | Reuse existing infrastructure, no new abstractions |
+| Principle             | Status | Notes                                                              |
+| --------------------- | ------ | ------------------------------------------------------------------ |
+| I. Code Quality       | PASS   | Will follow existing patterns, use prettier, single responsibility |
+| II. Testing (TDD/BDD) | PASS   | Tests written before implementation, BDD scenarios from spec       |
+| III. UX Consistency   | PASS   | Consistent with existing commands: --json, --help, error messages  |
+| IV. Performance       | PASS   | <2s goal aligns with 100ms init + network time                     |
+| V. MVP First          | PASS   | P1 (list names) → P2 (list values) → P3 (time filter)              |
+| VI. No Overdesign     | PASS   | Reuse existing infrastructure, no new abstractions                 |
 
 **All gates passed. No violations to justify.**
 

@@ -17,6 +17,7 @@ prom labels
 ```
 
 Output:
+
 ```
 __name__
 instance
@@ -34,6 +35,7 @@ prom labels job
 ```
 
 Output:
+
 ```
 prometheus
 node_exporter

@@ -76,7 +76,7 @@ As a user, I want to filter label names and values by a time range so that I can
 
 ### Key Entities
 
-- **Label Name**: A string identifier for a metric dimension (e.g., "job", "instance", "__name__").
+- **Label Name**: A string identifier for a metric dimension (e.g., "job", "instance", "`__name__`").
 - **Label Value**: A string value for a specific label (e.g., "prometheus", "localhost:9090").
 
 ## Success Criteria _(mandatory)_

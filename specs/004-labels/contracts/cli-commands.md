@@ -17,18 +17,18 @@ List Prometheus label names or values for a specific label.
 
 ### Arguments
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| label_name | No | If provided, list values for this label. If omitted, list all label names. |
+| Argument   | Required | Description                                                                |
+| ---------- | -------- | -------------------------------------------------------------------------- |
+| label_name | No       | If provided, list values for this label. If omitted, list all label names. |
 
 ### Options
 
-| Option | Short | Type | Default | Description |
-|--------|-------|------|---------|-------------|
-| --json | -j | boolean | false | Output as JSON |
-| --start | -s | string | - | Start time (RFC3339 or relative: 1h, 30m, now) |
-| --end | -e | string | - | End time (RFC3339 or relative: 1h, 30m, now) |
-| --help | -h | - | - | Show help |
+| Option  | Short | Type    | Default | Description                                    |
+| ------- | ----- | ------- | ------- | ---------------------------------------------- |
+| --json  | -j    | boolean | false   | Output as JSON                                 |
+| --start | -s    | string  | -       | Start time (RFC3339 or relative: 1h, 30m, now) |
+| --end   | -e    | string  | -       | End time (RFC3339 or relative: 1h, 30m, now)   |
+| --help  | -h    | -       | -       | Show help                                      |
 
 ### Examples
 
@@ -53,6 +53,7 @@ prom labels job --start 2024-01-01T00:00:00Z --end 2024-01-02T00:00:00Z
 #### Default Format (List)
 
 **List label names:**
+
 ```
 __name__
 instance
@@ -64,6 +65,7 @@ Total: 5 labels
 ```
 
 **List label values:**
+
 ```
 prometheus
 node_exporter
@@ -75,28 +77,30 @@ Total: 3 values for "job"
 #### JSON Format
 
 **List label names:**
+
 ```json
 ["__name__", "instance", "job", "method", "status_code"]
 ```
 
 **List label values:**
+
 ```json
 ["prometheus", "node_exporter", "alertmanager"]
 ```
 
 ### Exit Codes
 
-| Code | Description |
-|------|-------------|
-| 0 | Success |
-| 1 | Error (no config, connection failed, etc.) |
+| Code | Description                                |
+| ---- | ------------------------------------------ |
+| 0    | Success                                    |
+| 1    | Error (no config, connection failed, etc.) |
 
 ### Error Messages
 
-| Condition | Message |
-|-----------|---------|
-| No config | `Error: No configuration found. Run 'prom config' first.` |
-| Connection failed | `Error: Failed to connect to Prometheus server at <url>` |
+| Condition           | Message                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| No config           | `Error: No configuration found. Run 'prom config' first.`                                      |
+| Connection failed   | `Error: Failed to connect to Prometheus server at <url>`                                       |
 | Invalid time format | `Error: Invalid start/end time. Use RFC3339 (2024-01-01T00:00:00Z) or relative (1h, 30m, now)` |
-| Invalid time range | `Error: Start time must be before end time.` |
-| Empty results | `No labels found.` or `No values found for "<label>".` |
+| Invalid time range  | `Error: Start time must be before end time.`                                                   |
+| Empty results       | `No labels found.` or `No values found for "<label>".`                                         |

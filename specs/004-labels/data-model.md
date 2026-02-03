@@ -9,34 +9,34 @@
 
 Options for the labels command parsed from CLI arguments.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| labelName | string | No | Optional label name to get values for |
-| json | boolean | No | Output as JSON format |
-| start | string | No | Start time for filtering (RFC3339 or relative) |
-| end | string | No | End time for filtering (RFC3339 or relative) |
+| Field     | Type    | Required | Description                                    |
+| --------- | ------- | -------- | ---------------------------------------------- |
+| labelName | string  | No       | Optional label name to get values for          |
+| json      | boolean | No       | Output as JSON format                          |
+| start     | string  | No       | Start time for filtering (RFC3339 or relative) |
+| end       | string  | No       | End time for filtering (RFC3339 or relative)   |
 
 ### LabelsResponse (API Response)
 
 Response from Prometheus `/api/v1/labels` endpoint.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| status | "success" \| "error" | Response status |
-| data | string[] | Array of label names |
-| error | string | Error message (when status is "error") |
-| errorType | string | Error type (when status is "error") |
+| Field     | Type                 | Description                            |
+| --------- | -------------------- | -------------------------------------- |
+| status    | "success" \| "error" | Response status                        |
+| data      | string[]             | Array of label names                   |
+| error     | string               | Error message (when status is "error") |
+| errorType | string               | Error type (when status is "error")    |
 
 ### LabelValuesResponse (API Response)
 
 Response from Prometheus `/api/v1/label/<name>/values` endpoint.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| status | "success" \| "error" | Response status |
-| data | string[] | Array of label values |
-| error | string | Error message (when status is "error") |
-| errorType | string | Error type (when status is "error") |
+| Field     | Type                 | Description                            |
+| --------- | -------------------- | -------------------------------------- |
+| status    | "success" \| "error" | Response status                        |
+| data      | string[]             | Array of label values                  |
+| error     | string               | Error message (when status is "error") |
+| errorType | string               | Error type (when status is "error")    |
 
 ## Type Definitions
 
@@ -72,6 +72,7 @@ LabelsOptions ──uses──> TimeParseResult (existing)
 ```
 
 The labels command integrates with:
+
 - `services/config.ts` - Load server configuration
 - `services/prometheus.ts` - Make API calls
 - `services/time-parser.ts` - Parse time expressions

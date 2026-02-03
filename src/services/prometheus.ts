@@ -72,7 +72,8 @@ export function createClient(config: Config): AxiosInstance {
 }
 
 /**
- * Handle axios errors with user-friendly messages
+ * Handle errors with user-friendly messages
+ * Handles both AxiosError (network/API errors) and custom Error types (validation errors)
  */
 export function handleError(error: unknown, serverUrl: string): never {
   if (error instanceof AxiosError) {
@@ -95,6 +96,14 @@ export function handleError(error: unknown, serverUrl: string): never {
     process.exit(2);
   }
 
+  // Handle custom Error types (e.g., InvalidTimeExpressionError, InvalidTimeRangeError)
+  // These errors already have user-friendly messages, so we just display them
+  if (error instanceof Error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+
+  // Unknown error type - re-throw to show stack trace for debugging
   throw error;
 }
 

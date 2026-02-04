@@ -10,9 +10,55 @@ import {
   getTargets,
   handleError,
 } from "../services/prometheus.js";
+import type { Target } from "../types/index.js";
 
 interface TargetsOptions {
   json?: boolean;
+  job?: string;
+  state?: "up" | "down";
+}
+
+export class InvalidStateError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidStateError";
+  }
+}
+
+/**
+ * Validate state option value
+ * Throws InvalidStateError if state is not "up" or "down"
+ */
+export function validateStateOption(state: string | undefined): void {
+  if (state !== undefined && !["up", "down"].includes(state)) {
+    throw new InvalidStateError('--state must be "up" or "down"');
+  }
+}
+
+/**
+ * Filter targets based on job name and/or health state
+ * @param targets - Full list of targets from API
+ * @param options - Filter criteria (job and/or state)
+ * @returns Filtered subset of targets
+ */
+export function filterTargets(
+  targets: Target[],
+  options: { job?: string; state?: "up" | "down" },
+): Target[] {
+  return targets.filter((target) => {
+    // Job filter (exact match, case-sensitive)
+    if (options.job && target.job !== options.job) {
+      return false;
+    }
+
+    // State filter (health state enum)
+    if (options.state && target.health !== options.state) {
+      return false;
+    }
+
+    // No filters or all filters passed
+    return true;
+  });
 }
 
 /**
@@ -22,6 +68,8 @@ export function createTargetsCommand(): Command {
   const cmd = new Command("targets")
     .description("List scrape targets")
     .option("-j, --json", "Output as JSON")
+    .option("--job <name>", "Filter by job name")
+    .option("--state <state>", "Filter by health state (up or down)")
     .action(async (options: TargetsOptions) => {
       const config = loadConfig();
 
@@ -31,6 +79,9 @@ export function createTargetsCommand(): Command {
       }
 
       try {
+        // Validate state option
+        validateStateOption(options.state);
+
         const client = createClient(config);
         const targets = await getTargets(client);
 
@@ -39,9 +90,21 @@ export function createTargetsCommand(): Command {
           return;
         }
 
+        // Apply filters
+        const filteredTargets = filterTargets(targets, {
+          job: options.job,
+          state: options.state,
+        });
+
+        // Check if filtering resulted in empty list
+        if (filteredTargets.length === 0 && (options.job || options.state)) {
+          console.log("No targets found matching filters.");
+          return;
+        }
+
         if (options.json) {
           // JSON output
-          const jsonOutput = targets.map((t) => ({
+          const jsonOutput = filteredTargets.map((t) => ({
             job: t.job,
             instance: t.instance,
             health: t.health,
@@ -51,7 +114,7 @@ export function createTargetsCommand(): Command {
           console.log(formatJson(jsonOutput));
         } else {
           // Table output
-          const tableData = targets.map((t) => ({
+          const tableData = filteredTargets.map((t) => ({
             job: t.job,
             instance: t.instance,
             health: t.health,

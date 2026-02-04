@@ -44,9 +44,9 @@ prom-cli/
 **待實作 (Future)**
 
 - [x] query_range - 範圍查詢（matrix 結果）✅ 2025-01-03 完成 (PR #2)
-- [x] labels - 列出 label 名稱與值 ✅ 2025-01-05 完成
-- [ ] series - 列出時間序列
-- [ ] targets filter - 過濾 targets（--job, --state）
+- [x] labels - 列出 label 名稱與值 ✅ 2025-01-05 完成 (PR #3)
+- [x] series - 列出時間序列 ✅ 2025-02-03 完成 (PR #4)
+- [x] targets filter - 過濾 targets（--job, --state）✅ 2025-02-03 完成
 
 ## 2024-12-31 專案憲章與規格
 
@@ -198,3 +198,42 @@ prom-cli/
 - 14 個新測試涵蓋 getSeries() API 和時間解析功能
 - 總測試數量：121 個全部通過
 - 測試涵蓋：單一/多個 matchers、空結果、錯誤處理、時間範圍驗證
+
+## 2025-02-03 Targets Filter 功能實作
+
+### 實作概要
+
+- 執行 `/speckit.specify` 建立 006-targets-filter 規格
+- 執行 `/speckit.plan` 建立實作計畫
+- 執行 `/speckit.tasks` 生成 37 個任務（6 個階段）
+- 執行 `/speckit.implement` 完成所有功能
+
+### 完成的功能
+
+- `prom targets --job <name>` - 依 job 名稱過濾目標
+- `prom targets --state <up|down>` - 依健康狀態過濾目標
+- `prom targets --job <name> --state <state>` - 組合過濾（AND 邏輯）
+- 支援既有的 `--json` 輸出格式
+- 向後相容：無過濾參數時顯示全部目標
+
+### 技術決策
+
+- 客戶端過濾：Prometheus API 不支援伺服器端過濾
+- 純函數設計：filterTargets() 為可測試的純函數
+- AND 邏輯：多個過濾條件需同時符合
+- 型別安全：state 限定為 'up' | 'down' union type
+- 錯誤處理：無效 state 值會顯示錯誤訊息並 exit(1)
+
+### 實作方式
+
+- filterTargets() 函數：接收 targets 和過濾選項，回傳過濾後陣列
+- Array.filter() 實作：O(n) 複雜度，適用於典型目標數量（< 1000）
+- 重用既有格式化器：formatTargetsTable 和 formatJson
+- 空結果處理：區分「無目標配置」與「無符合過濾條件的目標」
+
+### 測試覆蓋
+
+- 7 個單元測試涵蓋 filterTargets() 函數
+- 測試案例：job 過濾、state 過濾、組合過濾、無過濾、空結果
+- 總測試數量：128 個全部通過
+- 遵循 BDD Given/When/Then 模式

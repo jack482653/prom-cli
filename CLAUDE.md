@@ -105,6 +105,9 @@ mcp__github__pull_request_read(
 
 ## Active Technologies
 
+- TypeScript 5.x with ES2022 (NodeNext modules) + commander (CLI), axios (HTTP client) (006-targets-filter)
+- N/A (stateless CLI) (006-targets-filter)
+
 - TypeScript 5.x (ES2022, NodeNext modules) + commander (CLI), axios (HTTP) (004-labels)
 
 - Markdown (GitHub Flavored Markdown) + N/A (documentation only) (002-readme)

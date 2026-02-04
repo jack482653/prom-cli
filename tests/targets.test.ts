@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-// Import filterTargets function (will be implemented)
-import { filterTargets } from "../src/commands/targets.js";
+import {
+  InvalidStateError,
+  filterTargets,
+  validateStateOption,
+} from "../src/commands/targets.js";
 import type { Target } from "../src/types/index.js";
 
 // Mock targets for testing
@@ -91,6 +94,37 @@ describe("filterTargets()", () => {
       const filtered = filterTargets(mockTargets, {});
 
       expect(filtered).toHaveLength(3);
+    });
+  });
+});
+
+describe("validateStateOption()", () => {
+  describe("Given valid state values", () => {
+    it("When state is 'up', Then does not throw", () => {
+      expect(() => validateStateOption("up")).not.toThrow();
+    });
+
+    it("When state is 'down', Then does not throw", () => {
+      expect(() => validateStateOption("down")).not.toThrow();
+    });
+
+    it("When state is undefined, Then does not throw", () => {
+      expect(() => validateStateOption(undefined)).not.toThrow();
+    });
+  });
+
+  describe("Given invalid state value", () => {
+    it("When state is 'invalid', Then throws InvalidStateError", () => {
+      expect(() => validateStateOption("invalid")).toThrow(InvalidStateError);
+      expect(() => validateStateOption("invalid")).toThrow('--state must be "up" or "down"');
+    });
+
+    it("When state is empty string, Then throws InvalidStateError", () => {
+      expect(() => validateStateOption("")).toThrow(InvalidStateError);
+    });
+
+    it("When state is 'UP' (wrong case), Then throws InvalidStateError", () => {
+      expect(() => validateStateOption("UP")).toThrow(InvalidStateError);
     });
   });
 });

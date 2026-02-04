@@ -18,6 +18,23 @@ interface TargetsOptions {
   state?: "up" | "down";
 }
 
+export class InvalidStateError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidStateError";
+  }
+}
+
+/**
+ * Validate state option value
+ * Throws InvalidStateError if state is not "up" or "down"
+ */
+export function validateStateOption(state: string | undefined): void {
+  if (state !== undefined && !["up", "down"].includes(state)) {
+    throw new InvalidStateError('--state must be "up" or "down"');
+  }
+}
+
 /**
  * Filter targets based on job name and/or health state
  * @param targets - Full list of targets from API
@@ -54,12 +71,6 @@ export function createTargetsCommand(): Command {
     .option("--job <name>", "Filter by job name")
     .option("--state <state>", "Filter by health state (up or down)")
     .action(async (options: TargetsOptions) => {
-      // Validate state option
-      if (options.state && !["up", "down"].includes(options.state)) {
-        console.error('Error: --state must be "up" or "down"');
-        process.exit(1);
-      }
-
       const config = loadConfig();
 
       if (!config) {
@@ -68,6 +79,9 @@ export function createTargetsCommand(): Command {
       }
 
       try {
+        // Validate state option
+        validateStateOption(options.state);
+
         const client = createClient(config);
         const targets = await getTargets(client);
 

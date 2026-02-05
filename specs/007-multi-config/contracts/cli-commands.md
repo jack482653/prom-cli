@@ -435,22 +435,25 @@ Operation cancelled.
 
 ---
 
-## Legacy Command Behavior
+## Breaking Changes from Previous Version
 
-### Command: `prom config`
+### Command: `prom config` (without arguments)
 
-**Old Behavior** (without arguments):
+**Old Behavior**:
 
 ```bash
-prom config
+prom config --show
 # Displays: Current configuration details
 ```
 
-**New Behavior** (without arguments):
+**New Behavior**:
 
 ```bash
 prom config
 # Displays: Help message with available subcommands
+
+# To show current config, use:
+prom config current
 ```
 
 **Help Output**:
@@ -481,30 +484,32 @@ For more help on a subcommand:
   prom config <subcommand> --help
 ```
 
-### Command: `prom config <url>`
+### Command: `prom config <url>` (REMOVED)
 
-**Old Behavior** (single argument URL):
-
-```bash
-prom config https://prometheus.example.com
-# Sets server URL
-```
-
-**New Behavior** (backward compatibility):
+**Old Behavior**:
 
 ```bash
-prom config https://prometheus.example.com
-# Deprecated: Use 'prom config add <name> <url>' instead
-
-# If no configs exist: Creates "default" config
-# If configs exist: Error message with migration guide
+prom config https://prometheus.example.com [--username <user>] [--password <pass>] [--token <token>] [--timeout <ms>]
+# Sets server URL and authentication
 ```
 
-**Backward Compatibility Note**:
+**New Behavior** (Breaking Change):
 
-- Old command format (`prom config <url>`) triggers automatic migration
-- Displays deprecation warning but continues to work
-- Encourages users to adopt new `add` subcommand
+The old `prom config <url>` command format is no longer supported. Users must use the new subcommand syntax:
+
+```bash
+# Old command (no longer works):
+prom config https://prometheus.example.com --username admin --password secret
+
+# New command:
+prom config add default https://prometheus.example.com --username admin --password secret
+```
+
+**Migration Notes**:
+
+- Configuration **file format** is automatically migrated (no data loss)
+- CLI interface requires learning new subcommand syntax
+- The `--timeout` option is not supported in this version (may be added in future)
 
 ---
 

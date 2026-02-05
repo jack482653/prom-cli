@@ -237,3 +237,51 @@ prom-cli/
 - 測試案例：job 過濾、state 過濾、組合過濾、無過濾、空結果
 - 總測試數量：128 個全部通過
 - 遵循 BDD Given/When/Then 模式
+
+## 2025-02-05 Multi-Config Management 功能實作
+
+### 實作概要
+
+- 執行 `/speckit.specify` 建立 007-multi-config 規格
+- 執行 `/speckit.plan` 建立實作計畫
+- 執行 `/speckit.tasks` 生成 120 個任務（9 個階段）
+- 執行 `/speckit.implement` 完成所有功能
+
+### 完成的功能
+
+- `prom config add <name> <url>` - 新增命名配置（支援 --username/--password/--token）
+- `prom config list` - 列出所有配置（顯示 active 指標）
+- `prom config use <name>` - 切換 active 配置
+- `prom config current` - 顯示目前 active 配置詳情
+- `prom config remove <name>` - 移除配置（支援 --force/--yes）
+- 自動遷移舊格式配置檔案（向後相容）
+
+### 配置檔案結構
+
+- 舊格式：`{ serverUrl, username?, password?, token? }`
+- 新格式：`{ activeConfig?: string, configs: { [name]: Configuration } }`
+
+### 技術決策
+
+- 使用 flat JSON 結構存儲多個配置（activeConfig + configs）
+- ConfigStore 模組處理配置操作（add, remove, setActive, getActive, list）
+- Migration 模組處理自動遷移（detectOldFormat, migrateOldConfig, backupOldConfig）
+- Atomic write（temp file + rename）確保檔案一致性
+- 首個配置自動成為 active
+- Commander.js subcommands 架構
+- 驗證函數：validateConfigName, validateServerUrl, validateAuthentication
+
+### 實作階段
+
+- Phase 1-2: 型別定義 + ConfigStore/migration 模組（TDD 實作，16 個測試）
+- Phase 3-5: MVP 功能（add, list, use）
+- Phase 6: 整合自動遷移到 loadConfig()
+- Phase 7-8: 補充功能（current, remove）
+- Phase 9: Polish（格式化、測試、文檔）
+
+### 測試覆蓋
+
+- 總測試數量：177 個全部通過（新增 43 個測試）
+- 16 個 ConfigStore 和 migration 測試
+- 27 個驗證函數測試
+- 涵蓋：配置新增/列出/切換/顯示/移除、自動遷移、錯誤處理

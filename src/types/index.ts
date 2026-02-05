@@ -175,3 +175,37 @@ export interface SeriesOptions {
  * A time series is identified by a unique set of label key-value pairs
  */
 export type LabelSet = Record<string, string>;
+
+/**
+ * Multi-config management types
+ * Feature: 007-multi-config
+ */
+
+/**
+ * Configuration for a single named Prometheus server
+ * Used in multi-config storage structure
+ * Storage: ~/.prom-cli/config.json (within ConfigStore)
+ */
+export interface Configuration {
+  serverUrl: string;
+  username?: string;
+  password?: string;
+  token?: string;
+}
+
+/**
+ * ConfigStore manages multiple named configurations
+ * Storage: ~/.prom-cli/config.json
+ * Structure:
+ * {
+ *   "activeConfig": "production",
+ *   "configs": {
+ *     "production": { ... },
+ *     "staging": { ... }
+ *   }
+ * }
+ */
+export interface ConfigStore {
+  activeConfig?: string;
+  configs: Record<string, Configuration>;
+}

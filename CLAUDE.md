@@ -105,6 +105,9 @@ mcp__github__pull_request_read(
 
 ## Active Technologies
 
+- TypeScript 5.x with ES2022 (NodeNext module resolution) + commander (CLI framework), axios (HTTP client), Node.js fs/path APIs (file operations) (007-multi-config)
+- JSON file at `~/.prom-cli/config.json` (redesigned structure for multi-config) (007-multi-config)
+
 - TypeScript 5.x with ES2022 (NodeNext modules) + commander (CLI), axios (HTTP client) (006-targets-filter)
 - N/A (stateless CLI) (006-targets-filter)
 

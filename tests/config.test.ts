@@ -90,18 +90,20 @@ describe("Config Service", () => {
     });
 
     describe("Given a valid config file exists", () => {
-      it("should return the parsed config", () => {
-        const mockConfig: Config = {
+      it("should return the parsed config (triggers migration)", () => {
+        const oldConfig = {
           serverUrl: "http://localhost:9090",
-          timeout: 30000,
         };
 
         vi.mocked(fs.existsSync).mockReturnValue(true);
-        vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(mockConfig));
+        vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(oldConfig));
 
         const config = loadConfig();
 
-        expect(config).toEqual(mockConfig);
+        // After migration, should return the active config
+        expect(config).toEqual({
+          serverUrl: "http://localhost:9090",
+        });
       });
     });
 

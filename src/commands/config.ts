@@ -42,6 +42,12 @@ interface RemoveConfigOptions {
   yes?: boolean;
 }
 
+// Table formatting constants for list command
+const TABLE_NAME_WIDTH = 14; // Width for name column (includes active indicator)
+const TABLE_URL_WIDTH = 36; // Width for URL column
+const TABLE_URL_MAX_LENGTH = 35; // Max URL length before truncation
+const TABLE_URL_TRUNCATE_AT = 32; // Truncation point for long URLs
+
 /**
  * Prompt user for confirmation
  */
@@ -342,13 +348,15 @@ function listConfigCommand(): void {
 
       // Format URL (truncate if too long)
       const url =
-        config.serverUrl.length > 35 ? config.serverUrl.substring(0, 32) + "..." : config.serverUrl;
+        config.serverUrl.length > TABLE_URL_MAX_LENGTH
+          ? config.serverUrl.substring(0, TABLE_URL_TRUNCATE_AT) + "..."
+          : config.serverUrl;
 
-      // Format name (pad to 14 characters including indicator)
-      const namePadded = (activeIndicator + " " + name).padEnd(14);
+      // Format name (pad to width including indicator)
+      const namePadded = (activeIndicator + " " + name).padEnd(TABLE_NAME_WIDTH);
 
-      // Format URL (pad to 36 characters)
-      const urlPadded = url.padEnd(36);
+      // Format URL (pad to width)
+      const urlPadded = url.padEnd(TABLE_URL_WIDTH);
 
       console.log(`${namePadded}${urlPadded}${authType}`);
     }

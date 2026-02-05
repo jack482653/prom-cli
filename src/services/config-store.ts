@@ -224,8 +224,8 @@ export function validateServerUrl(url: string): void {
     if (parsed.search || parsed.hash) {
       throw new Error("URL cannot contain query parameters or fragments");
     }
-  } catch (e: any) {
-    if (e.message.includes("Invalid URL")) {
+  } catch (e) {
+    if (e instanceof TypeError) {
       throw new Error(`Invalid URL format: ${url}`);
     }
     throw e;

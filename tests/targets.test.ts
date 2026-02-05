@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  InvalidStateError,
-  filterTargets,
-  validateStateOption,
-} from "../src/commands/targets.js";
+import { InvalidStateError, filterTargets, validateStateOption } from "../src/commands/targets.js";
 import type { Target } from "../src/types/index.js";
 
 // Mock targets for testing

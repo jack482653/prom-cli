@@ -28,3 +28,4 @@ coverage/
 # Temporary
 *.tmp
 *.swp
+.claude/settings.local.json

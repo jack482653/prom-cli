@@ -59,7 +59,7 @@ export function validateLabelOption(label: string): void {
  */
 export function filterTargets(
   targets: Target[],
-  options: { job?: string; state?: "up" | "down"; labels?: string[] },
+  options: { job?: string; state?: "up" | "down"; labels?: { key: string; value: string }[] },
 ): Target[] {
   return targets.filter((target) => {
     if (options.job && target.job !== options.job) {
@@ -71,10 +71,7 @@ export function filterTargets(
     }
 
     if (options.labels && options.labels.length > 0) {
-      for (const label of options.labels) {
-        const eqIndex = label.indexOf("=");
-        const key = label.slice(0, eqIndex);
-        const value = label.slice(eqIndex + 1);
+      for (const { key, value } of options.labels) {
         if (target.labels[key] !== value) {
           return false;
         }
@@ -113,10 +110,12 @@ export function createTargetsCommand(): Command {
         // Validate state option
         validateStateOption(options.state);
 
-        // Validate label options
-        for (const label of options.label ?? []) {
+        // Validate and parse label options once
+        const parsedLabels = (options.label ?? []).map((label) => {
           validateLabelOption(label);
-        }
+          const eqIndex = label.indexOf("=");
+          return { key: label.slice(0, eqIndex), value: label.slice(eqIndex + 1) };
+        });
 
         const client = createClient(config);
         const targets = await getTargets(client);
@@ -130,7 +129,7 @@ export function createTargetsCommand(): Command {
         const filteredTargets = filterTargets(targets, {
           job: options.job,
           state: options.state,
-          labels: options.label,
+          labels: parsedLabels,
         });
 
         // Check if filtering resulted in empty list

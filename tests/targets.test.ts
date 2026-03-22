@@ -130,7 +130,9 @@ describe("filterTargets() — label filtering", () => {
 
   describe("Given targets with label filter", () => {
     it("When single label filter matches, Then returns matching targets only", () => {
-      const filtered = filterTargets(labelTargets, { labels: ["env=production"] });
+      const filtered = filterTargets(labelTargets, {
+        labels: [{ key: "env", value: "production" }],
+      });
 
       expect(filtered).toHaveLength(2);
       expect(filtered.every((t) => t.labels.env === "production")).toBe(true);
@@ -138,7 +140,10 @@ describe("filterTargets() — label filtering", () => {
 
     it("When multiple label filters applied, Then applies AND logic", () => {
       const filtered = filterTargets(labelTargets, {
-        labels: ["env=production", "region=us-east"],
+        labels: [
+          { key: "env", value: "production" },
+          { key: "region", value: "us-east" },
+        ],
       });
 
       expect(filtered).toHaveLength(1);
@@ -146,14 +151,14 @@ describe("filterTargets() — label filtering", () => {
     });
 
     it("When label value does not match, Then returns empty array", () => {
-      const filtered = filterTargets(labelTargets, { labels: ["env=unknown"] });
+      const filtered = filterTargets(labelTargets, { labels: [{ key: "env", value: "unknown" }] });
 
       expect(filtered).toHaveLength(0);
     });
 
     it("When label filter combined with state filter, Then applies all conditions", () => {
       const filtered = filterTargets(labelTargets, {
-        labels: ["env=production"],
+        labels: [{ key: "env", value: "production" }],
         state: "up",
       });
 

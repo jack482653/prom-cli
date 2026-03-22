@@ -1,5 +1,6 @@
 import { Command } from "commander";
 
+import { formatCsv } from "../formatters/csv.js";
 import { formatJson } from "../formatters/json.js";
 import { formatQueryTable } from "../formatters/table.js";
 import { loadConfig } from "../services/config.js";
@@ -8,6 +9,7 @@ import type { VectorResult } from "../types/index.js";
 
 interface QueryOptions {
   json?: boolean;
+  csv?: boolean;
   time?: string;
 }
 
@@ -29,6 +31,7 @@ export function createQueryCommand(): Command {
     .description("Execute PromQL query")
     .argument("<expression>", "PromQL expression")
     .option("-j, --json", "Output as JSON")
+    .option("--csv", "Output as CSV")
     .option("-t, --time <ts>", "Evaluation timestamp (RFC3339 or Unix)")
     .action(async (expression: string, options: QueryOptions) => {
       const config = loadConfig();
@@ -60,23 +63,50 @@ export function createQueryCommand(): Command {
               labels: formatLabels(r.metric),
               value: r.value[1],
             }));
-            console.log(formatQueryTable(tableData));
+            if (options.csv) {
+              console.log(
+                formatCsv({
+                  columns: [
+                    { header: "metric", key: "metric" },
+                    { header: "labels", key: "labels" },
+                    { header: "value", key: "value" },
+                  ],
+                  data: tableData,
+                }),
+              );
+            } else {
+              console.log(formatQueryTable(tableData));
+            }
             break;
           }
 
           case "scalar": {
+            if (options.csv) {
+              console.error("Error: --csv is only supported for vector results.");
+              process.exit(1);
+            }
             const scalarResult = result.result as { value: [number, string] };
             console.log(`scalar: ${scalarResult.value[1]}`);
             break;
           }
 
           case "string": {
+            if (options.csv) {
+              console.error("Error: --csv is only supported for vector results.");
+              process.exit(1);
+            }
             const stringResult = result.result as { value: [number, string] };
             console.log(`string: "${stringResult.value[1]}"`);
             break;
           }
 
           case "matrix": {
+            if (options.csv) {
+              console.error(
+                "Error: --csv is not supported for matrix results. Use prom query-range --csv instead.",
+              );
+              process.exit(1);
+            }
             // Matrix results are complex, show as JSON for clarity
             console.log("Matrix result (use --json for full output):");
             console.log(formatJson(result));

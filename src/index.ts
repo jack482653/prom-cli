@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 
+import { createAlertsCommand } from "./commands/alerts.js";
 import { createConfigCommand } from "./commands/config.js";
 import { createLabelsCommand } from "./commands/labels.js";
 import { createQueryRangeCommand } from "./commands/query-range.js";
 import { createQueryCommand } from "./commands/query.js";
+import { createRulesCommand } from "./commands/rules.js";
 import { createSeriesCommand } from "./commands/series.js";
 import { createStatusCommand } from "./commands/status.js";
 import { createTargetsCommand } from "./commands/targets.js";
@@ -23,6 +25,8 @@ program.addCommand(createQueryCommand());
 program.addCommand(createQueryRangeCommand());
 program.addCommand(createLabelsCommand());
 program.addCommand(createSeriesCommand());
+program.addCommand(createAlertsCommand());
+program.addCommand(createRulesCommand());
 program.addCommand(createStatusCommand());
 
 program.parse();

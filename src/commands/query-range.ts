@@ -1,5 +1,6 @@
 import { Command } from "commander";
 
+import { formatCsv } from "../formatters/csv.js";
 import { formatJson } from "../formatters/json.js";
 import { formatMatrixTable } from "../formatters/table.js";
 import { loadConfig } from "../services/config.js";
@@ -54,6 +55,7 @@ export function createQueryRangeCommand(): Command {
     .requiredOption("-e, --end <time>", "End time (RFC3339 or relative: 1h, 30m, now)")
     .option("-p, --step <seconds>", "Resolution step in seconds", parseInt)
     .option("-j, --json", "Output as JSON (includes all timestamps and values)")
+    .option("--csv", "Output as CSV (one row per data point)")
     .action(async (expression: string, options: QueryRangeOptions) => {
       const config = loadConfig();
 
@@ -134,6 +136,34 @@ Time range: ${options.start} to ${options.end}`);
           console.warn(
             `Warning: Large result set (${totalDataPoints} data points). Consider using a larger step or shorter time range.`,
           );
+        }
+
+        if (options.csv) {
+          const csvRows: Record<string, unknown>[] = [];
+          for (const r of result.result as MatrixResult[]) {
+            const metric = r.metric.__name__ || "";
+            const labels = formatLabels(r.metric);
+            for (const [ts, val] of r.values) {
+              csvRows.push({
+                metric,
+                labels,
+                timestamp: new Date(ts * 1000).toISOString(),
+                value: val,
+              });
+            }
+          }
+          console.log(
+            formatCsv({
+              columns: [
+                { header: "metric", key: "metric" },
+                { header: "labels", key: "labels" },
+                { header: "timestamp", key: "timestamp" },
+                { header: "value", key: "value" },
+              ],
+              data: csvRows,
+            }),
+          );
+          return;
         }
 
         // Format matrix results for table

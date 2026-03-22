@@ -131,6 +131,7 @@ export interface QueryRangeOptions {
   end: string; // Required: end time expression
   step?: number; // Optional: step in seconds
   json?: boolean; // Optional: JSON output flag
+  csv?: boolean; // Optional: CSV output flag
 }
 
 /**
@@ -208,4 +209,82 @@ export interface Configuration {
 export interface ConfigStore {
   activeConfig?: string;
   configs: Record<string, Configuration>;
+}
+
+/**
+ * Alerts types
+ * Feature: 008-alerts-rules-enhancements
+ */
+
+export interface RawAlert {
+  labels: Record<string, string>;
+  annotations: Record<string, string>;
+  state: "firing" | "pending";
+  activeAt: string;
+  value: string;
+}
+
+export interface AlertsData {
+  alerts: RawAlert[];
+}
+
+export interface Alert {
+  name: string;
+  state: "firing" | "pending";
+  severity: string;
+  labels: Record<string, string>;
+  annotations: Record<string, string>;
+  activeAt: Date;
+  value: string;
+}
+
+/**
+ * Rules types
+ * Feature: 008-alerts-rules-enhancements
+ */
+
+export interface RawAlertingRule {
+  type: "alerting";
+  name: string;
+  query: string;
+  duration: number;
+  labels: Record<string, string>;
+  annotations: Record<string, string>;
+  health: "ok" | "err" | "unknown";
+  lastEvaluation: string;
+  evaluationTime: number;
+}
+
+export interface RawRecordingRule {
+  type: "recording";
+  name: string;
+  query: string;
+  labels: Record<string, string>;
+  health: "ok" | "err" | "unknown";
+  lastEvaluation: string;
+  evaluationTime: number;
+}
+
+export type RawRule = RawAlertingRule | RawRecordingRule;
+
+export interface RuleGroup {
+  name: string;
+  file: string;
+  interval: number;
+  rules: RawRule[];
+}
+
+export interface RulesData {
+  groups: RuleGroup[];
+}
+
+export interface Rule {
+  name: string;
+  type: "alerting" | "recording";
+  query: string;
+  health: "ok" | "err" | "unknown";
+  group: string;
+  duration?: number;
+  labels: Record<string, string>;
+  annotations: Record<string, string>;
 }

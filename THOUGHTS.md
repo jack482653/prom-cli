@@ -238,6 +238,40 @@ prom-cli/
 - 總測試數量：128 個全部通過
 - 遵循 BDD Given/When/Then 模式
 
+## 2026-03-22 Alerts/Rules/CSV/Label Filter 功能實作
+
+### 實作概要
+
+- 執行 `/speckit.specify` 建立 008-alerts-rules-enhancements 規格
+- 執行 `/speckit.plan` 建立實作計畫
+- 執行 `/speckit.tasks` 生成 35 個任務（7 個階段）
+- 執行 `/speckit.implement` 完成所有功能
+
+### 完成的功能
+
+- `prom alerts` - 列出目前觸發中的 alerts（firing/pending），支援 `--json` / `--csv`
+- `prom rules` - 列出 alerting/recording rules，支援 `--type alerting|recording`、`--json` / `--csv`
+- `--csv` 輸出格式 - 新增至所有 tabular 輸出命令（targets, query, query-range, alerts, rules）
+- `prom targets --label key=value` - 依 label 過濾目標（可多個，AND 邏輯）
+
+### 新增 API 端點
+
+- `/api/v1/alerts` - 取得目前觸發中的 alerts
+- `/api/v1/rules` - 取得所有 alerting/recording rules（依 group 分組，CLI 展平輸出）
+
+### 技術決策
+
+- CSV formatter 自行實作（~30 行），無新增外部依賴（RFC 4180 標準）
+- Rules API 回傳巢狀 group 結構，CLI 展平為一維陣列方便 agent 消費
+- Label filter 延伸既有 `filterTargets()` 純函數，加入 `labels?: string[]` 參數
+- `--label` 使用 commander repeatable option，支援多個 `--label` flag
+
+### 測試覆蓋
+
+- 總測試數量：219 個全部通過（新增 42 個測試）
+- 新增測試檔案：alerts.test.ts、rules.test.ts、csv-formatter.test.ts
+- 延伸測試：targets.test.ts 新增 label filter 相關測試
+
 ## 2025-02-05 Multi-Config Management 功能實作
 
 ### 實作概要

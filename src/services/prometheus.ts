@@ -2,6 +2,8 @@ import axios, { AxiosError, AxiosInstance } from "axios";
 
 import type {
   ActiveTarget,
+  Alert,
+  AlertsData,
   BuildInfo,
   Config,
   LabelSet,
@@ -10,6 +12,9 @@ import type {
   QueryRangeParams,
   QueryRangeResult,
   QueryResult,
+  Rule,
+  RuleGroup,
+  RulesData,
   ServerStatus,
   Target,
   TargetsData,
@@ -274,6 +279,58 @@ export async function getLabelValues(
   }
 
   return response.data.data;
+}
+
+/**
+ * Get currently active alerts from Prometheus
+ */
+export async function getAlerts(client: AxiosInstance): Promise<Alert[]> {
+  const response = await client.get<PrometheusResponse<AlertsData>>("/api/v1/alerts");
+
+  if (response.data.status !== "success" || !response.data.data) {
+    return [];
+  }
+
+  return response.data.data.alerts.map((raw) => {
+    const { alertname, severity, ...restLabels } = raw.labels;
+    return {
+      name: alertname || "",
+      state: raw.state,
+      severity: severity || "",
+      labels: restLabels,
+      annotations: raw.annotations,
+      activeAt: new Date(raw.activeAt),
+      value: raw.value,
+    };
+  });
+}
+
+/**
+ * Get all configured rules from Prometheus, flattened from groups
+ */
+export async function getRules(client: AxiosInstance): Promise<Rule[]> {
+  const response = await client.get<PrometheusResponse<RulesData>>("/api/v1/rules");
+
+  if (response.data.status !== "success" || !response.data.data) {
+    return [];
+  }
+
+  const rules: Rule[] = [];
+  for (const group of response.data.data.groups as RuleGroup[]) {
+    for (const raw of group.rules) {
+      rules.push({
+        name: raw.name,
+        type: raw.type,
+        query: raw.query,
+        health: raw.health,
+        group: group.name,
+        duration: raw.type === "alerting" ? raw.duration : undefined,
+        labels: raw.labels,
+        annotations: raw.type === "alerting" ? raw.annotations : {},
+      });
+    }
+  }
+  return rules;
 }
 
 /**

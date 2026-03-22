@@ -108,6 +108,72 @@ export function formatQueryTable(
 }
 
 /**
+ * Format alerts as table
+ */
+export function formatAlertsTable(
+  alerts: Array<{
+    name: string;
+    state: string;
+    severity: string;
+    labels: Record<string, string>;
+    activeAt: Date;
+    value: string;
+  }>,
+): string {
+  const data = alerts.map((a) => {
+    const labelPairs = Object.entries(a.labels);
+    const labelsStr =
+      labelPairs.length === 0
+        ? "{}"
+        : `{${labelPairs.map(([k, v]) => `${k}="${v}"`).join(",")}}`;
+    return {
+      name: a.name,
+      state: a.state,
+      severity: a.severity,
+      labels: labelsStr,
+      activeAt: a.activeAt.toISOString(),
+      value: a.value,
+    };
+  });
+
+  return formatTable({
+    columns: [
+      { header: "ALERT NAME", key: "name" },
+      { header: "STATE", key: "state" },
+      { header: "SEVERITY", key: "severity" },
+      { header: "LABELS", key: "labels" },
+      { header: "ACTIVE SINCE", key: "activeAt" },
+      { header: "VALUE", key: "value" },
+    ],
+    data,
+  });
+}
+
+/**
+ * Format rules as table
+ */
+export function formatRulesTable(
+  rules: Array<{
+    name: string;
+    type: string;
+    group: string;
+    health: string;
+    query: string;
+  }>,
+): string {
+  return formatTable({
+    columns: [
+      { header: "NAME", key: "name" },
+      { header: "TYPE", key: "type" },
+      { header: "GROUP", key: "group" },
+      { header: "HEALTH", key: "health" },
+      { header: "EXPRESSION", key: "query" },
+    ],
+    data: rules,
+  });
+}
+
+/**
  * Format matrix (range query) results as table
  */
 export function formatMatrixTable(

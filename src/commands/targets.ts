@@ -1,5 +1,6 @@
 import { Command } from "commander";
 
+import { formatCsv } from "../formatters/csv.js";
 import { formatJson } from "../formatters/json.js";
 import { formatTargetsTable } from "../formatters/table.js";
 import { loadConfig } from "../services/config.js";
@@ -14,8 +15,10 @@ import type { Target } from "../types/index.js";
 
 interface TargetsOptions {
   json?: boolean;
+  csv?: boolean;
   job?: string;
   state?: "up" | "down";
+  label?: string[];
 }
 
 export class InvalidStateError extends Error {
@@ -25,9 +28,15 @@ export class InvalidStateError extends Error {
   }
 }
 
+export class InvalidLabelError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidLabelError";
+  }
+}
+
 /**
  * Validate state option value
- * Throws InvalidStateError if state is not "up" or "down"
  */
 export function validateStateOption(state: string | undefined): void {
   if (state !== undefined && !["up", "down"].includes(state)) {
@@ -36,27 +45,39 @@ export function validateStateOption(state: string | undefined): void {
 }
 
 /**
- * Filter targets based on job name and/or health state
- * @param targets - Full list of targets from API
- * @param options - Filter criteria (job and/or state)
- * @returns Filtered subset of targets
+ * Validate a single --label value (must be "key=value" format with non-empty key)
+ */
+export function validateLabelOption(label: string): void {
+  const eqIndex = label.indexOf("=");
+  if (eqIndex <= 0) {
+    throw new InvalidLabelError(`--label must be in "key=value" format, got: "${label}"`);
+  }
+}
+
+/**
+ * Filter targets based on job name, health state, and/or labels
  */
 export function filterTargets(
   targets: Target[],
-  options: { job?: string; state?: "up" | "down" },
+  options: { job?: string; state?: "up" | "down"; labels?: { key: string; value: string }[] },
 ): Target[] {
   return targets.filter((target) => {
-    // Job filter (exact match, case-sensitive)
     if (options.job && target.job !== options.job) {
       return false;
     }
 
-    // State filter (health state enum)
     if (options.state && target.health !== options.state) {
       return false;
     }
 
-    // No filters or all filters passed
+    if (options.labels && options.labels.length > 0) {
+      for (const { key, value } of options.labels) {
+        if (target.labels[key] !== value) {
+          return false;
+        }
+      }
+    }
+
     return true;
   });
 }
@@ -68,8 +89,15 @@ export function createTargetsCommand(): Command {
   const cmd = new Command("targets")
     .description("List scrape targets")
     .option("-j, --json", "Output as JSON")
+    .option("--csv", "Output as CSV")
     .option("--job <name>", "Filter by job name")
     .option("--state <state>", "Filter by health state (up or down)")
+    .option(
+      "--label <key=value>",
+      "Filter by label (repeatable)",
+      (val, prev: string[]) => [...(prev ?? []), val],
+      [] as string[],
+    )
     .action(async (options: TargetsOptions) => {
       const config = loadConfig();
 
@@ -81,6 +109,13 @@ export function createTargetsCommand(): Command {
       try {
         // Validate state option
         validateStateOption(options.state);
+
+        // Validate and parse label options once
+        const parsedLabels = (options.label ?? []).map((label) => {
+          validateLabelOption(label);
+          const eqIndex = label.indexOf("=");
+          return { key: label.slice(0, eqIndex), value: label.slice(eqIndex + 1) };
+        });
 
         const client = createClient(config);
         const targets = await getTargets(client);
@@ -94,16 +129,18 @@ export function createTargetsCommand(): Command {
         const filteredTargets = filterTargets(targets, {
           job: options.job,
           state: options.state,
+          labels: parsedLabels,
         });
 
         // Check if filtering resulted in empty list
-        if (filteredTargets.length === 0 && (options.job || options.state)) {
+        const hasFilters =
+          options.job || options.state || (options.label && options.label.length > 0);
+        if (filteredTargets.length === 0 && hasFilters) {
           console.log("No targets found matching filters.");
           return;
         }
 
         if (options.json) {
-          // JSON output
           const jsonOutput = filteredTargets.map((t) => ({
             job: t.job,
             instance: t.instance,
@@ -112,8 +149,27 @@ export function createTargetsCommand(): Command {
             lastScrapeDuration: t.lastScrapeDuration,
           }));
           console.log(formatJson(jsonOutput));
+        } else if (options.csv) {
+          const csvData = filteredTargets.map((t) => ({
+            job: t.job,
+            instance: t.instance,
+            health: t.health,
+            lastScrape: t.lastScrape.toISOString(),
+            lastScrapeDuration: String(t.lastScrapeDuration),
+          }));
+          console.log(
+            formatCsv({
+              columns: [
+                { header: "job", key: "job" },
+                { header: "instance", key: "instance" },
+                { header: "health", key: "health" },
+                { header: "lastScrape", key: "lastScrape" },
+                { header: "lastScrapeDuration", key: "lastScrapeDuration" },
+              ],
+              data: csvData,
+            }),
+          );
         } else {
-          // Table output
           const tableData = filteredTargets.map((t) => ({
             job: t.job,
             instance: t.instance,
